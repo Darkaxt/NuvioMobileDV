@@ -40,7 +40,7 @@ Dolby Vision Profile 7 FEL decoding. Device playback validation is intentionally
 performed by the fork owner as real-world samples become available.
 
 Public NuvioDV builds are distributed as ARM64 APKs on this fork's
-[GitHub Releases](https://github.com/Darkaxt/NuvioMobile/releases) page. They
+[GitHub Releases](https://github.com/Darkaxt/NuvioMobileDV/releases) page. They
 are consistently signed by the fork's dedicated release key and can be tracked
 by release-monitoring clients such as Obtainium or ObtainX. Every published build
 is a normal release so update clients see one monotonic release lineage.
@@ -104,7 +104,7 @@ deployed `nuvio.tv` validator while retaining explicit native account-source sem
 ## Build from source
 
 ```bash
-git clone https://github.com/Darkaxt/NuvioMobile.git
+git clone https://github.com/Darkaxt/NuvioMobileDV.git
 cd NuvioMobile
 ```
 

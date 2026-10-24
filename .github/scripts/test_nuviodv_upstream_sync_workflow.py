@@ -114,7 +114,7 @@ class NuvioDvUpstreamSyncWorkflowTest(unittest.TestCase):
 
     def test_in_app_updater_uses_the_fork_release_feed(self) -> None:
         self.assertIn(
-            'url = "https://api.github.com/repos/Darkaxt/NuvioMobile/${releasePath(channel)}"',
+            'url = "https://api.github.com/repos/Darkaxt/NuvioMobileDV/${releasePath(channel)}"',
             self.app_updater_repository,
         )
         self.assertNotIn(
