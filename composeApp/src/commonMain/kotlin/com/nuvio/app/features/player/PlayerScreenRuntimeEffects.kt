@@ -27,6 +27,7 @@ import com.nuvio.app.features.p2p.P2pStreamingState
 import com.nuvio.app.features.player.skip.NextEpisodeInfo
 import com.nuvio.app.features.player.skip.PlayerNextEpisodeRules
 import com.nuvio.app.features.player.skip.SkipIntroRepository
+import com.nuvio.app.features.player.skip.segmentCategory
 import com.nuvio.app.features.player.skip.shouldAutoSkip
 import com.nuvio.app.features.player.skip.internalSkipAction
 import com.nuvio.app.features.player.skip.intervalsAtSeekPositions
@@ -149,6 +150,7 @@ internal fun PlayerScreenRuntime.BindPlayerRuntimeEffects() {
         showChaptersPanel = false
         chapters = emptyList()
         chaptersLoadedForSourceUrl = null
+        clearChapterSkipState()
         episodeStreamsPanelState = EpisodeStreamsPanelState()
         PlayerStreamsRepository.clearEpisodeStreams()
         SubtitleRepository.clear()
@@ -616,6 +618,8 @@ private fun PlayerScreenRuntime.BindPlayerMetadataAndSkipEffects() {
         playerSettingsUiState.skipIntroEnabled, networkCondition,
     ) {
         skipIntervals = emptyList()
+        apiSkipIntervals = emptyList()
+        clearChapterSkipState()
         autoSkippedIntervals.clear()
         lastManualSkipSeekPositions = null
         activeSkipInterval = null
@@ -629,7 +633,9 @@ private fun PlayerScreenRuntime.BindPlayerMetadataAndSkipEffects() {
         val vid = activeVideoId
         if (!playerSettingsUiState.skipIntroEnabled) return@LaunchedEffect
         if ((contentType ?: parentMetaType).equals("movie", ignoreCase = true)) {
-            skipIntervals = SkipIntroRepository.getMovieSkipIntervals(parentMetaId, vid)
+            val api = SkipIntroRepository.getMovieSkipIntervals(parentMetaId, vid)
+            apiSkipIntervals = api
+            recomputeMergedSkipIntervals()
             return@LaunchedEffect
         }
         if (season == null || episode == null || vid == null) return@LaunchedEffect
@@ -659,8 +665,9 @@ private fun PlayerScreenRuntime.BindPlayerMetadataAndSkipEffects() {
                         episode = episode,
                     )
                 }
-            } ?: return@launch
-            skipIntervals = intervals
+            }
+            apiSkipIntervals = intervals ?: return@launch
+            recomputeMergedSkipIntervals()
         }
     }
 
@@ -670,6 +677,7 @@ private fun PlayerScreenRuntime.BindPlayerMetadataAndSkipEffects() {
         playerSettingsUiState.skipIntroEnabled, isScrubbingTimeline, initialSeekApplied,
         lastManualSkipSeekPositions,
     ) {
+        recomputeChapterSkipIntervalsIfNeeded()
         if (skipIntervals.isEmpty()) {
             activeSkipInterval = null
             return@LaunchedEffect
@@ -683,8 +691,28 @@ private fun PlayerScreenRuntime.BindPlayerMetadataAndSkipEffects() {
                 interval.internalSkipAction(skipIntervals, playbackSnapshot.durationMs) != null
         }
         if (current != activeSkipInterval) {
-            activeSkipInterval = current
-            if (current != null) skipIntervalDismissed = false
+            if (current != null) {
+                // Keep dismissed state when replacing same segment type (e.g. API recap -> chapter recap)
+                val keepDismissed = activeSkipInterval != null &&
+                    segmentCategory(activeSkipInterval?.type ?: "") == segmentCategory(current.type)
+                activeSkipInterval = current
+                if (!keepDismissed) skipIntervalDismissed = false
+            } else if (activeSkipInterval != null) {
+                // Position is outside all intervals. Keep the button only if the same type
+                // starts within 2s (chapter replacing API with a slightly later start).
+                val posSec = playbackSnapshot.positionMs / 1000.0
+                val nearby = skipIntervals.firstOrNull {
+                    segmentCategory(it.type) == segmentCategory(activeSkipInterval?.type ?: "") &&
+                        posSec < it.startTime &&
+                        it.startTime - posSec <= 2.0
+                }
+                if (nearby != null) {
+                    activeSkipInterval = nearby
+                } else {
+                    activeSkipInterval = null
+                    skipIntervalDismissed = false
+                }
+            }
         }
         val controller = playerController
         if (current != null && controller != null &&

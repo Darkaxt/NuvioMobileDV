@@ -2,6 +2,7 @@ package com.nuvio.app.features.player
 
 import android.graphics.Typeface
 import android.provider.OpenableColumns
+import android.util.AtomicFile
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -31,9 +32,15 @@ internal actual object SubtitleFontStorage {
     actual fun write(name: String, bytes: ByteArray) {
         val target = file(name)
         target.parentFile?.mkdirs()
-        val temporary = File(target.path + ".tmp")
-        temporary.writeBytes(bytes)
-        check(temporary.renameTo(target))
+        val atomicFile = AtomicFile(target)
+        val output = atomicFile.startWrite()
+        try {
+            output.write(bytes)
+            atomicFile.finishWrite(output)
+        } catch (error: Throwable) {
+            atomicFile.failWrite(output)
+            throw error
+        }
     }
 
     actual fun remove(name: String) { file(name).delete() }
