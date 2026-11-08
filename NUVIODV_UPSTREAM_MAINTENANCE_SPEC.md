@@ -40,9 +40,21 @@ was removed through the reviewed cleanup helper after lifecycle completion.
 The built APK has package `com.darkaxt.nuviodv`, label `NuvioDV`, version
 `0.6.10-nuviodv.2` / `12259`. Its libmpv, JNI and FFmpeg payloads match the qualified
 AAR byte-for-byte. Its stripped C++ runtime retains the AAR's build ID
-`ba615e4ff75bc2d8ba1eee93f983e02bc427c433`. Source/build verification is complete;
-normal signed release publication and independent public APK verification remain
-assigned to the final delivery stage. No device playback claim is made.
+`ba615e4ff75bc2d8ba1eee93f983e02bc427c433`.
+
+Final delivery is COMPLETE: run `42535938912` published normal, non-draft release
+[`v0.6.10-nuviodv.2`](https://github.com/Darkaxt/NuvioMobileDV/releases/tag/v0.6.10-nuviodv.2)
+from exact source `82c8dada01798eabf6111a9f473e794cc3ee0163`.
+Independently retrieved APK SHA-256
+`3daaf2c07f29eb7e6e0c535a7b2625f9083707a81592f19c2447a48209362e29`
+matches public release metadata. Package/version/code/label and ARM64-only code
+pass actual APK inspection. Signature Scheme v2 verifies with the existing
+certificate SHA-256 `1FB94424753A90F993C678B6FA4322579253BB303F22C335DB395A9E2557D571`.
+All ten qualified AAR native libraries, including its C++ runtime, match the
+published APK byte-for-byte. Its updater references `Darkaxt/NuvioMobileDV`.
+Generated Supabase/Trakt/SIMKL/MDBList configuration checks passed in the signed
+release workflow. No blocker or tracked deferral remains for this native update.
+No device playback claim is made.
 
 - M1: A GitHub Actions workflow must check `NuvioMedia/NuvioMobile` branch `cmp-rewrite` daily.
 - M2: When no upstream commit is missing from `Darkaxt/NuvioMobileDV:cmp-rewrite`, the workflow must not create a commit, push, or release.
