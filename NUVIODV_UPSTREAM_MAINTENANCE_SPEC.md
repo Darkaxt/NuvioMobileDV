@@ -4,6 +4,46 @@ Authorization: `already_authorized` by the user on 2026-09-12.
 
 ## Requirements
 
+### Current authorized native-player update (2026-11-08)
+
+The user requested updating Android mpv and consuming the result in NuvioDV.
+Use the independently qualified AAR from library source
+`84c7e40cb83ba66918edf4ce811b4a177b742c79`, workflow `42532012258`, SHA-256
+`e8f5e4063a2db82a78c84350d8170ec7951a301488248b82b1bae9a4779bf02a`.
+It advances mpv to `8bc468896ec7` and libplacebo to `9fabf6d5057c` / API 387,
+retaining the existing FFmpeg/libdovi pins, RPU/P010 patches and wrapper API.
+
+The cross-repository authoritative ledger is
+`D:\Projects\mpv\DOCS\NUVIODV_WINDOWS_RUNTIME_SPEC.md`. Native qualification is
+COMPLETE; this application's integration/verification stage is COMPLETE. Consume
+the exact artifact, keep base version `0.6.10`, advance the fork counter to `2`
+and Android code to `12259`, pass existing contracts and the required integrated
+Android build, then publish and independently verify the signed normal release
+at the exact completed source. Preserve all other fork features and runtime
+credentials. Both automated sync and release builds must check one shared native
+checksum. Device playback remains owner validation; do not claim it from a build.
+
+Rollback restores the prior AAR from Git history (SHA-256
+`b266c9f5ed940b761da572f1496fcf2152fe624cdfd42354b33ba5c9e3fc8721`) and
+publishes it with a new higher version code; do not reset app data or attempt an
+automatic Android version-code downgrade. No application-stage deferrals.
+
+Verification: version/sync/RPDB contracts and authenticated release-configuration
+checks pass. Gate ticket `009a8bd351384cb6917a797357760a92` acquired
+`Local\Darka.AndroidGradleBuildGate` and completed the focused player engine-switch,
+technical-details and settings tests plus `:androidApp:assembleFullDebug`.
+Observed profile: two workers, no parallel projects, Gradle 3 GiB heap with
+in-process Kotlin sharing it, one 512 MiB test fork, preserved required JVM flags.
+No memory failure; single-use Gradle daemon exit verified. Its D: compiler scratch
+was removed through the reviewed cleanup helper after lifecycle completion.
+
+The built APK has package `com.darkaxt.nuviodv`, label `NuvioDV`, version
+`0.6.10-nuviodv.2` / `12259`. Its libmpv, JNI and FFmpeg payloads match the qualified
+AAR byte-for-byte. Its stripped C++ runtime retains the AAR's build ID
+`ba615e4ff75bc2d8ba1eee93f983e02bc427c433`. Source/build verification is complete;
+normal signed release publication and independent public APK verification remain
+assigned to the final delivery stage. No device playback claim is made.
+
 - M1: A GitHub Actions workflow must check `NuvioMedia/NuvioMobile` branch `cmp-rewrite` daily.
 - M2: When no upstream commit is missing from `Darkaxt/NuvioMobileDV:cmp-rewrite`, the workflow must not create a commit, push, or release.
 - M3: When upstream commits are missing, merge their history into the fork without discarding NuvioDV changes. The workflow may automatically preserve the fork's `iosApp/Configuration/Version.xcconfig` during a conflict limited to that file; any other merge conflict must fail closed for manual repair.

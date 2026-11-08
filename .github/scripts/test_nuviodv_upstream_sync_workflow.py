@@ -1,3 +1,4 @@
+import hashlib
 import unittest
 from pathlib import Path
 
@@ -87,6 +88,19 @@ class NuvioDvUpstreamSyncWorkflowTest(unittest.TestCase):
         self.assertIn('[[ "${source_sha}" == "${REQUESTED_SOURCE_SHA}" ]]', self.release_workflow)
         self.assertIn("SOURCE_SHA: ${{ steps.release.outputs.source_sha }}", self.release_workflow)
         self.assertIn('--target "${SOURCE_SHA}"', self.release_workflow)
+
+    def test_native_player_pin_matches_binary_and_both_workflows(self) -> None:
+        native_path = "composeApp/libs/lib-mpv-android-libdovi-arm64.aar"
+        digest = hashlib.sha256((REPOSITORY_ROOT / native_path).read_bytes()).hexdigest()
+        checksum_path = native_path + ".sha256"
+        self.assertEqual(
+            f"{digest}  {native_path}",
+            (REPOSITORY_ROOT / checksum_path).read_text(encoding="utf-8").strip(),
+        )
+        for workflow in (self.workflow, self.release_workflow):
+            self.assertTrue(f"sha256sum --check {checksum_path}" in workflow,
+                            "Both sync and release workflows must verify the shared native checksum")
+        self.assertIn(digest.upper(), (REPOSITORY_ROOT / "README.md").read_text(encoding="utf-8"))
 
     def test_release_requires_and_verifies_mdblist_client_identifier(self) -> None:
         self.assertIn(

@@ -30,10 +30,16 @@ outside the current scope.
 The Android build vendors `composeApp/libs/lib-mpv-android-libdovi-arm64.aar`
 from [Darkaxt/mpv-android-libdovi](https://github.com/Darkaxt/mpv-android-libdovi):
 
-- source commit: `a6d4de8b2109347e07dcd2daef258deee9a97e29`
-- successful build: [GitHub Actions run 34656988140](https://github.com/Darkaxt/mpv-android-libdovi/actions/runs/34656988140)
+- source commit: `84c7e40cb83ba66918edf4ce811b4a177b742c79`
+- successful build: [GitHub Actions run 42532012258](https://github.com/Darkaxt/mpv-android-libdovi/actions/runs/42532012258)
 - artifact: `mpv-android-libdovi-arm64`
-- AAR SHA-256: `B266C9F5ED940B761DA572F1496FCF2152FE624CDFD42354B33BA5C9E3FC8721`
+- AAR SHA-256: `E8F5E4063A2DB82A78C84350D8170EC7951A301488248B82B1BAE9A4779BF02A`
+- mpv core: `8bc468896ec711cc5a3ac33dae9cbc0e266bcfa4` (matching the owned Windows baseline)
+- libplacebo: `9fabf6d5057c40089afb020017c6347002b07308`, API 387, retaining leak fix `c93aa134`
+
+FFmpeg 8.1.1, libdovi 3.3.2, the MediaCodec RPU/P010 patches and the 0.1.12
+wrapper API remain unchanged. Both the upstream-sync and signed-release workflows
+verify the vendored AAR against the adjacent SHA-256 file before building.
 
 The native libmpv payload is ARM64-only. This integration does not claim full
 Dolby Vision Profile 7 FEL decoding. Device playback validation is intentionally

@@ -67,6 +67,7 @@ class AdvanceNuvioDvVersionTest(unittest.TestCase):
                 fork_config.read_text(encoding="utf-8"),
                 "CURRENT_PROJECT_VERSION=12204\nMARKETING_VERSION=0.4.17-nuviodv.5\n",
             )
+            self.assertNotIn(b"\r", fork_config.read_bytes())
 
 
 if __name__ == "__main__":

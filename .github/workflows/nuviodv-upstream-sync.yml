@@ -134,8 +134,7 @@ jobs:
           grep -Fq 'applicationId = "com.darkaxt.nuviodv"' androidApp/build.gradle.kts
           grep -Fq '<string name="app_name">NuvioDV</string>' androidApp/src/debug/res/values/strings.xml
           grep -Fq '<string name="app_name">NuvioDV</string>' composeApp/src/androidMain/res/values/strings.xml
-          test "$(sha256sum composeApp/libs/lib-mpv-android-libdovi-arm64.aar | cut -d ' ' -f 1)" = \
-            'b266c9f5ed940b761da572f1496fcf2152fe624cdfd42354b33ba5c9e3fc8721'
+          sha256sum --check composeApp/libs/lib-mpv-android-libdovi-arm64.aar.sha256
 
       - name: Build the integrated Android application
         if: steps.upstream.outputs.has_updates == 'true'

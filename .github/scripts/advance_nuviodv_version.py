@@ -93,7 +93,7 @@ def advance_version_file(fork_config: Path, upstream_config: Path) -> tuple[str,
     )
     if code_replacements != 1 or name_replacements != 1:
         raise ValueError(f"Expected exactly one version value of each kind in {fork_config}")
-    fork_config.write_text(content, encoding="utf-8")
+    fork_config.write_text(content, encoding="utf-8", newline="\n")
     return next_name, next_code
 
 

@@ -93,7 +93,10 @@ jobs:
         run: bash .github/scripts/configure-nuviodv-release.sh
 
       - name: Build signed release APKs
-        run: ./gradlew :androidApp:assembleFullRelease --stacktrace
+        run: |
+          set -euo pipefail
+          sha256sum --check composeApp/libs/lib-mpv-android-libdovi-arm64.aar.sha256
+          ./gradlew :androidApp:assembleFullRelease --stacktrace
 
       - name: Verify generated authentication configuration
         shell: bash
