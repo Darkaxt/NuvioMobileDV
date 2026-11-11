@@ -47,6 +47,28 @@ The post-repair no-update check passed on original sync run `43084002957`,
 attempt 2, without merge, commit, push or release. Android maintenance is COMPLETE;
 no blocker or tracked deferral remains for this delivered scope.
 
+### 2026-11-11 issue delta review
+
+Paginated open-issue retrieval covered all 34 issues updated since November 8
+midnight; 28 meet the previous heartbeat cutoff `2026-11-08T19:04:48Z`.
+Relevant bodies and all their comments were inspected, plus baseline reports
+#1730, #1675, #1723, #2444, #2391, #2395, #1956 and #1972. None of those baselines
+has new comments since that cutoff. #1730 remains the high-relevance historical
+descriptor-exhaustion/leak-class baseline; #1675/#1723 gain no new player-path
+evidence. #2613 and #2564 concern iOS player transitions, not the Android libmpv
+path. #2377 gained a feature upvote, not native failure logs. No new actionable
+DV/libplacebo/GPU-next/decoder/subtitle-audio pipeline evidence was found.
+
+Existing [#2574](https://github.com/NuvioMedia/NuvioMobile/issues/2574), updated
+November 8 at 15:02 UTC (before the preceding heartbeat), reports purple output
+after 15-20 minutes while audio continues on Motorola E7 Plus / Android 10,
+upstream 0.6.10-beta, with YUV420P compatibility disabled; reopening recovers.
+It has no logs or explicit renderer/decoder/descriptor evidence and is not a new
+post-cutoff finding or proof that the fork's pinned leak fix regressed. Retain it
+as an unconfirmed candidate if engine/renderer and FD logs become available.
+No issue-driven change or upstream comment was made. Next delta cutoff is this
+review's retrieval, November 11 at approximately 21:31 UTC.
+
 ### Current authorized native-player update (2026-11-08)
 
 The user requested updating Android mpv and consuming the result in NuvioDV.
