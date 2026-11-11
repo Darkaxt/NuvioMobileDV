@@ -92,11 +92,19 @@ jobs:
         shell: bash
         run: bash .github/scripts/configure-nuviodv-release.sh
 
+      - name: Verify complete Android host suite on Linux
+        run: |
+          ./gradlew :composeApp:testAndroidHostTest --no-daemon --max-workers=2 --no-parallel \
+            '-Dorg.gradle.jvmargs=-Xmx3g -Dfile.encoding=UTF-8 -XX:MaxMetaspaceSize=2048m' \
+            -Pkotlin.compiler.execution.strategy=in-process --stacktrace
+
       - name: Build signed release APKs
         run: |
           set -euo pipefail
           sha256sum --check composeApp/libs/lib-mpv-android-libdovi-arm64.aar.sha256
-          ./gradlew :androidApp:assembleFullRelease --stacktrace
+          ./gradlew :androidApp:assembleFullRelease --no-daemon --max-workers=2 --no-parallel \
+            '-Dorg.gradle.jvmargs=-Xmx3g -Dfile.encoding=UTF-8 -XX:MaxMetaspaceSize=2048m' \
+            -Pkotlin.compiler.execution.strategy=in-process --stacktrace
 
       - name: Verify generated authentication configuration
         shell: bash

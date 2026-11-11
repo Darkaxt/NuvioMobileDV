@@ -36,6 +36,12 @@ PLAYER_TIMELINE = PLAYER_CONTROLS.with_name("PlayerTimeline.kt")
 
 
 class NuvioDvUpstreamSyncWorkflowTest(unittest.TestCase):
+    def test_release_requires_complete_android_host_suite_on_linux(self) -> None:
+        command = './gradlew :composeApp:testAndroidHostTest'
+        self.assertIn(command, self.release_workflow)
+        self.assertLess(self.release_workflow.index(command),
+                        self.release_workflow.index('- name: Build signed release APKs'))
+
     @classmethod
     def setUpClass(cls) -> None:
         cls.workflow = WORKFLOW.read_text(encoding="utf-8")

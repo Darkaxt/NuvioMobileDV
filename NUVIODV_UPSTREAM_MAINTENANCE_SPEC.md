@@ -4,6 +4,62 @@ Authorization: `already_authorized` by the user on 2026-09-12.
 
 ## Requirements
 
+### 2026-11-11 maintenance: source ready for validation
+
+The recurring check found upstream `4135f96cd` (0.6.12) 26 commits beyond the
+previous healthy fork sync. Run `43084002957` failed closed before compiling or
+pushing because `FolderDetailRepository.kt` conflicts with fork Trakt routing,
+in addition to the expected version conflict. The manual merge retains
+`source.catalogRouteKey()` and upstream's new `folderCatalogTabLabel` behavior.
+All other merged player/chapter/settings paths and the unchanged fork workflows
+are reconciled; no unmerged entries or known source gap remains. Fork invariant,
+version, RPDB and authenticated-release configuration contracts pass.
+
+The active maintenance stage is Android sync and normal delivery, governed also
+by `D:\Projects\mpv\DOCS\NUVIODV_WINDOWS_RUNTIME_SPEC.md`. Version is
+`0.6.12-nuviodv.1` / `12261`; the qualified AAR checksum remains `e8f5e406...`.
+Source is ready for integrated validation, not yet verified or delivered.
+Run the complete Android host tests (the merge spans player, stream/cache and
+collection behavior) and full debug APK assembly in one managed Gradle invocation,
+then commit/push and publish/independently verify the exact-source signed normal
+release. No device access, native pin change or feature expansion is included.
+
+Validation attempt `8b18a08b4a4a8859935836faa5909092` under readiness receipt
+`ca89a6f179c27cf16a81149fb0eb4fcb` failed in the download lifecycle persistence
+test; no APK was published. The host uses Windows `File.renameTo`, which cannot
+replace an existing file, while Android's `AtomicFile.finishWrite` relies on
+POSIX replacement semantics. A scoped host-test shadow replaces only AtomicFile's
+private rename primitive with `Files.move(ATOMIC_MOVE, REPLACE_EXISTING)`; its real
+serialization, write/sync/read and lifecycle paths remain exercised. Production
+download storage is unchanged. Revalidate on the original failed receipt after
+this complete test-host correction; do not skip the failing lifecycle test.
+Correction attempt `2d44ee0d90ff25bf31bf46e854303798` verifies every lifecycle
+case on SDK 34/36, then exposes the same host rename limitation in
+`DownloadSubtitlesTest` when reloading completed scheduler state. Apply the scoped
+shadow to all three host-test classes that use the download scheduler/store.
+Limit the shadowed primitive to SDK 30+, retaining pre-30 AtomicFile behavior.
+Fail-fast left tests and APK assembly pending; the original receipt must reach
+complete integrated validation before release.
+Attempt `bdca42c21f4605dfd0e3844832131384` then isolates another Windows-only
+host mismatch: AndroidX FileProvider's POSIX slash boundary rejects Windows cache
+paths in the external-subtitle sharing test. Remove the experimental test shadows
+and preserve every upstream test and assertion. The final verification arrangement
+requires the full unmodified Android host suite on the Linux signed-release runner
+before packaging/publication, guarded by a source regression contract. That runner
+uses two workers, no parallel projects, a 3 GiB Gradle heap and in-process Kotlin.
+Windows validates the affected portable player/collection tests and full debug
+APK assembly on the same original failed receipt. This changes the execution
+host, not the required tested behavior; the Linux suite is still an advancement
+blocker until it passes. No production download defect is established by the
+Windows-specific failures, and no download production change is carried.
+Local validation now passes on workflow `2c57a206c1908e2018d804f1bdaa7690`
+(original receipt attempt 4): affected portable tests, full debug APK assembly,
+correct identity/version/code and byte-identical libmpv/JNI/FFmpeg payload.
+Managed native exit is zero and process-tree exit is verified. The enforced profile
+uses two workers, no parallel projects, 3 GiB Gradle/Kotlin daemon heaps and one
+test fork; no memory failure occurred. Signed Linux suite, release publication and
+independent public APK verification remain required before this stage completes.
+
 ### Current authorized native-player update (2026-11-08)
 
 The user requested updating Android mpv and consuming the result in NuvioDV.
