@@ -59,6 +59,18 @@ Managed native exit is zero and process-tree exit is verified. The enforced prof
 uses two workers, no parallel projects, 3 GiB Gradle/Kotlin daemon heaps and one
 test fork; no memory failure occurred. Signed Linux suite, release publication and
 independent public APK verification remain required before this stage completes.
+Linux release run `43088040328` executed the complete suite and stopped before
+publication on four failures. Root causes: the carried chapter change removed
+upstream's post-/mid-credits navigation target; the legacy-progress fixture uses
+a one-second placeholder despite the newer 121-second placeholder guard; and the
+Trakt test appends to an unsynchronized list from concurrent request coroutines.
+Restore upstream's `post-credits` target category while retaining the fork's
+long-credit interval limit, use a realistic 94%-watched duration in the identity
+fixture, and serialize only the Trakt test's request recorder with a Mutex.
+These cohesive corrections are source ready for the existing Linux full-suite
+and signed-APK workflow. No additional local Gradle build or receipt replay is
+claimed; the prior Windows result applies only to its recorded source. Full Linux
+tests/build and independent delivery remain advancement blockers until verified.
 
 ### Current authorized native-player update (2026-11-08)
 

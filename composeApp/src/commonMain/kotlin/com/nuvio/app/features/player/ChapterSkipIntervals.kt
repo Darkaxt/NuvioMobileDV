@@ -11,8 +11,8 @@ import com.nuvio.app.features.player.skip.segmentCategory
  * false positives on scene-named chapters like "The Opening" or "Alternate Ending".
  *
  * Matched types: OP/Opening, ED/Ending/Credits, Recap/Previously, Intro.
- * Post-/mid-/after-credits scene markers are deliberately excluded because the
- * scene itself is content, not a segment that should be skipped.
+ * Post-/mid-/after-credits scenes provide a post-credits navigation target;
+ * the player does not treat that category as a skippable scene segment.
  * "Intro" is promoted to opening only when no dedicated OP/Opening chapter exists.
  */
 internal object ChapterSkipIntervals {
@@ -72,7 +72,7 @@ internal object ChapterSkipIntervals {
             } else {
                 MAX_DURATION_SEC
             }
-            if (duration > maxDuration) return@mapNotNull null
+            if (c.type != ChapterType.POST_CREDITS && duration > maxDuration) return@mapNotNull null
             SkipInterval(
                 startTime = startSec,
                 endTime = endSec,
@@ -84,7 +84,7 @@ internal object ChapterSkipIntervals {
 
     private fun classifyTitle(title: String?): ChapterType? {
         if (title.isNullOrBlank()) return null
-        if (POST_CREDITS_PATTERN.containsMatchIn(title)) return null
+        if (POST_CREDITS_PATTERN.containsMatchIn(title)) return ChapterType.POST_CREDITS
         if (OPENING_PATTERN.matches(title)) return ChapterType.OPENING
         if (ENDING_PATTERN.matches(title)) return ChapterType.ENDING
         if (CREDITS_PATTERN.matches(title)) return ChapterType.ENDING
@@ -98,6 +98,7 @@ internal object ChapterSkipIntervals {
         ENDING("outro"),
         RECAP("recap"),
         INTRO("intro"),
+        POST_CREDITS("post-credits"),
     }
 
     private data class ClassifiedChapter(

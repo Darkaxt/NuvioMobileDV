@@ -4,6 +4,8 @@ import com.nuvio.app.features.addons.RawHttpResponse
 import com.nuvio.app.features.collection.CollectionSource
 import com.nuvio.app.features.collection.TraktCollectionSourceType
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -134,8 +136,9 @@ class TraktAccountCatalogClientTest {
     @Test
     fun `up next and unwatched exclude dropped shows and use progress`() = runBlocking {
         val requested = mutableListOf<String>()
+        val requestedLock = Mutex()
         val client = client { url, _ ->
-            requested += url
+            requestedLock.withLock { requested += url }
             when {
                 "/sync/watched/shows" in url -> response(
                     url,
