@@ -716,6 +716,8 @@ private fun ExoPlayerSurface(
             latestOnError.value(runBlocking { error.toDisplayMessage() })
         }
 
+        var unplayableVideoReported = false
+
         val listener = object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
                 syncPlayerViewKeepScreenOn()
@@ -849,6 +851,18 @@ private fun ExoPlayerSurface(
             override fun onTracksChanged(tracks: androidx.media3.common.Tracks) {
                 Log.d(TAG, "onTracksChanged: ${tracks.groups.size} groups total")
                 exoPlayer.logCurrentTracks("onTracksChanged")
+                if (!unplayableVideoReported) {
+                    tracks.unplayableVideoFormatDescription()?.let { format ->
+                        // No error would otherwise be raised: audio plays over a black picture.
+                        unplayableVideoReported = true
+                        Log.w(PLAYER_DIAGNOSTIC_TAG, "unplayable video track format=$format")
+                        exoPlayer.pause()
+                        latestOnError.value(
+                            runBlocking { getString(Res.string.player_error_unsupported_format, format) },
+                        )
+                        return
+                    }
+                }
                 pendingAudioTrackSelection.firstOrNull()?.let { selection ->
                     if (tracks.groups.any { it.type == C.TRACK_TYPE_AUDIO }) {
                         pendingAudioTrackSelection.clear()
