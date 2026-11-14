@@ -21,6 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// NuvioDV modification: MAIN is sampled with texture(MAIN_raw, ...) instead of the
+// MAIN_tex/MAIN_texOff macros, which Adreno GLES rejects under mpv gpu-next (libplacebo
+// aliases them to MAINPRESUB_*). The arithmetic is unchanged.
+
 //!DESC Anime4K-v3.2-Upscale-CNN-x2-(M)-Conv-4x3x3x3
 //!HOOK MAIN
 //!BIND MAIN
@@ -29,7 +33,7 @@
 //!HEIGHT MAIN.h
 //!COMPONENTS 4
 //!WHEN OUTPUT.w MAIN.w / 1.200 > OUTPUT.h MAIN.h / 1.200 > *
-#define go_0(x_off, y_off) (MAIN_texOff(vec2(x_off, y_off)))
+#define go_0(x_off, y_off) (MAIN_mul * texture(MAIN_raw, MAIN_pos + MAIN_pt * vec2(x_off, y_off)))
 vec4 hook() {
     vec4 result = mat4(-0.010995803, 0.077095956, -0.043992598, 0.06048717, 0.1164834, -0.11689607, 0.072985925, -0.078805886, 0.01182932, 0.054985743, -0.09018186, 0.044907484, 0.0, 0.0, 0.0, 0.0) * go_0(-1.0, -1.0);
     result += mat4(0.1813623, -0.14752422, 0.025720436, -0.17639883, 0.15697388, 0.10445984, -0.1843076, 0.5264643, 0.047516696, -0.097305484, 0.09740847, -0.29619336, 0.0, 0.0, 0.0, 0.0) * go_0(-1.0, 0.0);
@@ -296,5 +300,5 @@ vec4 hook() {
     float c1 = c0;
     float c2 = c1;
     float c3 = c2;
-    return vec4(c0, c1, c2, c3) + MAIN_tex(MAIN_pos);
+    return vec4(c0, c1, c2, c3) + MAIN_mul * texture(MAIN_raw, MAIN_pos);
 }

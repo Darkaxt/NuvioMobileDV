@@ -1596,6 +1596,7 @@ private fun LibmpvPlayerSurface(
                         "message=${diagnosticPlayerMessage(text)}",
                 )
                 errorLog.onLog(prefix, level, text)
+                if (text.contains("Failed executing hook")) view.onUserShaderDisabled()
             }
         }
         view.mpv.addObserver(observer)
@@ -1757,6 +1758,18 @@ private class NuvioLibmpvView(
     private var upscaleRequested = false
     private var appliedShader: String? = null
     private var lastUpscaleStatus: UpscaleStatus? = null
+    // Shader the renderer disabled at runtime (compile/dispatch failure); never re-reported as Active.
+    private var rejectedShader: String? = null
+
+    /** mpv logged that the renderer disabled a user shader hook; report Failed instead of Active. */
+    fun onUserShaderDisabled() {
+        executeMpv {
+            val shader = appliedShader ?: return@executeMpv
+            if (rejectedShader == shader) return@executeMpv
+            rejectedShader = shader
+            reevaluateUpscaleNow()
+        }
+    }
 
     fun setUpscaleRequested(requested: Boolean) {
         executeMpv {
@@ -1794,6 +1807,9 @@ private class NuvioLibmpvView(
             // An empty list clears the shaders; mpv rebuilds the render chain without reloading the file.
             mpv.setPropertyString("glsl-shaders", shader.orEmpty())
             appliedShader = shader
+        }
+        if (shader != null && shader == rejectedShader && status.kind == UpscaleStatus.Kind.Active) {
+            status = status.copy(kind = UpscaleStatus.Kind.Failed, error = "Renderer disabled the shader")
         }
         if (status != lastUpscaleStatus) {
             lastUpscaleStatus = status
