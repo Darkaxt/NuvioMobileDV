@@ -59,6 +59,7 @@ actual object PlayerSettingsStorage {
     private const val androidLibmpvVideoOutputKey = "android_libmpv_video_output"
     private const val androidLibmpvHardwareDecodingEnabledKey = "android_libmpv_hardware_decoding_enabled"
     private const val androidLibmpvYuv420pEnabledKey = "android_libmpv_yuv420p_enabled"
+    private const val androidLibmpvAnime4kEnabledKey = "android_libmpv_anime4k_enabled"
     private const val androidExoChaptersEnabledKey = "android_exo_chapters_enabled"
     private const val chapterTitleEnabledKey = "chapter_title_enabled"
     private const val rememberAudioDelayPerDeviceKey = "remember_audio_delay_per_device"
@@ -161,6 +162,7 @@ actual object PlayerSettingsStorage {
         androidLibmpvVideoOutputKey,
         androidLibmpvHardwareDecodingEnabledKey,
         androidLibmpvYuv420pEnabledKey,
+        androidLibmpvAnime4kEnabledKey,
         androidExoChaptersEnabledKey,
         chapterTitleEnabledKey,
         rememberAudioDelayPerDeviceKey,
@@ -692,6 +694,16 @@ actual object PlayerSettingsStorage {
         }
     }
 
+    actual fun loadAndroidLibmpvAnime4kEnabled(): Boolean? {
+        val defaults = NSUserDefaults.standardUserDefaults
+        val key = ProfileScopedKey.of(androidLibmpvAnime4kEnabledKey)
+        return if (defaults.objectForKey(key) != null) {
+            defaults.boolForKey(key)
+        } else {
+            null
+        }
+    }
+
     actual fun loadAndroidExoChaptersEnabled(): Boolean? {
         val defaults = NSUserDefaults.standardUserDefaults
         val key = ProfileScopedKey.of(androidExoChaptersEnabledKey)
@@ -704,6 +716,10 @@ actual object PlayerSettingsStorage {
 
     actual fun saveAndroidLibmpvYuv420pEnabled(enabled: Boolean) {
         NSUserDefaults.standardUserDefaults.setBool(enabled, forKey = ProfileScopedKey.of(androidLibmpvYuv420pEnabledKey))
+    }
+
+    actual fun saveAndroidLibmpvAnime4kEnabled(enabled: Boolean) {
+        NSUserDefaults.standardUserDefaults.setBool(enabled, forKey = ProfileScopedKey.of(androidLibmpvAnime4kEnabledKey))
     }
 
     actual fun saveAndroidExoChaptersEnabled(enabled: Boolean) {
@@ -1341,6 +1357,7 @@ actual object PlayerSettingsStorage {
             put(androidLibmpvHardwareDecodingEnabledKey, encodeSyncBoolean(it))
         }
         loadAndroidLibmpvYuv420pEnabled()?.let { put(androidLibmpvYuv420pEnabledKey, encodeSyncBoolean(it)) }
+        loadAndroidLibmpvAnime4kEnabled()?.let { put(androidLibmpvAnime4kEnabledKey, encodeSyncBoolean(it)) }
         loadAndroidExoChaptersEnabled()?.let { put(androidExoChaptersEnabledKey, encodeSyncBoolean(it)) }
         loadChapterTitleEnabled()?.let { put(chapterTitleEnabledKey, encodeSyncBoolean(it)) }
         loadRememberAudioDelayPerDevice()?.let { put(rememberAudioDelayPerDeviceKey, encodeSyncBoolean(it)) }
@@ -1437,6 +1454,7 @@ actual object PlayerSettingsStorage {
         payload.decodeSyncBoolean(androidLibmpvHardwareDecodingEnabledKey)
             ?.let(::saveAndroidLibmpvHardwareDecodingEnabled)
         payload.decodeSyncBoolean(androidLibmpvYuv420pEnabledKey)?.let(::saveAndroidLibmpvYuv420pEnabled)
+        payload.decodeSyncBoolean(androidLibmpvAnime4kEnabledKey)?.let(::saveAndroidLibmpvAnime4kEnabled)
         payload.decodeSyncBoolean(androidExoChaptersEnabledKey)?.let(::saveAndroidExoChaptersEnabled)
         payload.decodeSyncBoolean(chapterTitleEnabledKey)?.let(::saveChapterTitleEnabled)
         payload.decodeSyncBoolean(rememberAudioDelayPerDeviceKey)?.let(::saveRememberAudioDelayPerDevice)

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Animation
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Info
@@ -34,6 +35,10 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.nuvio.app.features.cloud.CloudLibraryContentType
 import com.nuvio.app.features.cloud.cloudLibraryDisplayArtworkUrl
+import com.nuvio.app.features.playback.classification.AnimationToggleSurface
+import com.nuvio.app.features.playback.classification.continueWatchingTitleFacts
+import com.nuvio.app.features.playback.classification.label
+import com.nuvio.app.features.playback.classification.rememberAnimationToggle
 import com.nuvio.app.features.rpdb.rpdbPortraitSelection
 import com.nuvio.app.features.watchprogress.ContinueWatchingItem
 import kotlinx.coroutines.launch
@@ -62,6 +67,16 @@ fun NuvioContinueWatchingActionSheet(
     val tokens = MaterialTheme.nuvio
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
+    // Episodes edit their series value (parentMetaId/parentMetaType); cloud items have no title type.
+    val animationToggle = rememberAnimationToggle(
+        metaId = item.parentMetaId,
+        metaType = item.parentMetaType,
+        displayTitle = item.title,
+        facts = remember(item.parentMetaId, item.parentMetaType) {
+            continueWatchingTitleFacts(item.parentMetaId, item.parentMetaType)
+        },
+        surface = AnimationToggleSurface.ContinueWatchingSheet,
+    )
 
     fun dismissAfter(action: () -> Unit) {
         action()
@@ -111,6 +126,15 @@ fun NuvioContinueWatchingActionSheet(
                     icon = Icons.Default.CheckCircle,
                     title = stringResource(Res.string.hero_mark_watched),
                     onClick = { dismissAfter(onMarkWatched) },
+                )
+            }
+            if (animationToggle != null) {
+                // Stays open so the new On/Off state is visible.
+                NuvioBottomSheetActionRow(
+                    icon = Icons.Default.Animation,
+                    title = animationToggle.label(),
+                    onClick = animationToggle::toggle,
+                    selected = animationToggle.enabled,
                 )
             }
             NuvioBottomSheetActionRow(

@@ -94,6 +94,8 @@ expect fun PlatformPlayerSurface(
     initialPositionRequestKey: String? = null,
     resizeMode: PlayerResizeMode = PlayerResizeMode.Fit,
     playbackEngine: AndroidPlaybackEngine? = null,
+    /** The title is eligible for animation upscaling (Android libmpv applies Anime4K). */
+    animationUpscale: Boolean = false,
     useNativeController: Boolean = false,
     onInitialPositionHandled: (key: String, handled: Boolean) -> Unit = { _, _ -> },
     onControllerReady: (PlayerEngineController) -> Unit,

@@ -28,10 +28,7 @@ internal fun resolveAutoPlaybackEngine(
         return AndroidPlaybackEngine.ExoPlayer
     }
 
-    val hasAnimeId = videoId?.startsWith("kitsu:") == true ||
-        videoId?.startsWith("mal:") == true ||
-        videoId?.startsWith("anilist:") == true
-    if (hasAnimeId) return AndroidPlaybackEngine.Libmpv
+    if (isAnimeNamespaceId(videoId)) return AndroidPlaybackEngine.Libmpv
 
     if (genres.any { it.equals("anime", ignoreCase = true) }) {
         return AndroidPlaybackEngine.Libmpv
@@ -43,6 +40,10 @@ internal fun resolveAutoPlaybackEngine(
 
     return AndroidPlaybackEngine.ExoPlayer
 }
+
+/** Anime provider id namespaces (kitsu/mal/anilist), shared with playback content classification. */
+internal fun isAnimeNamespaceId(id: String?): Boolean =
+    id?.startsWith("kitsu:") == true || id?.startsWith("mal:") == true || id?.startsWith("anilist:") == true
 
 private val HDR_OR_DOLBY_VISION_REGEX = Regex("""(?i)\b(hdr|hdr10\+?|dv|dolby\s*vision)\b""")
 

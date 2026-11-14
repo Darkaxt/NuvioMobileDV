@@ -62,6 +62,7 @@ data class PlayerSettingsUiState(
     val androidLibmpvVideoOutput: AndroidLibmpvVideoOutput = AndroidLibmpvVideoOutput.GpuNext,
     val androidLibmpvHardwareDecodingEnabled: Boolean = true,
     val androidLibmpvYuv420pEnabled: Boolean = false,
+    val androidLibmpvAnime4kEnabled: Boolean = true,
     val androidExoChaptersEnabled: Boolean = false,
     val chapterTitleEnabled: Boolean = true,
     val rememberAudioDelayPerDevice: Boolean = true,
@@ -178,6 +179,7 @@ object PlayerSettingsRepository {
     private var androidLibmpvVideoOutput = AndroidLibmpvVideoOutput.GpuNext
     private var androidLibmpvHardwareDecodingEnabled = true
     private var androidLibmpvYuv420pEnabled = false
+    private var androidLibmpvAnime4kEnabled = true
     private var androidExoChaptersEnabled = false
     private var chapterTitleEnabled = true
     private var rememberAudioDelayPerDevice = true
@@ -281,6 +283,7 @@ object PlayerSettingsRepository {
         androidLibmpvVideoOutput = AndroidLibmpvVideoOutput.GpuNext
         androidLibmpvHardwareDecodingEnabled = true
         androidLibmpvYuv420pEnabled = false
+        androidLibmpvAnime4kEnabled = true
         androidExoChaptersEnabled = false
         chapterTitleEnabled = true
         rememberAudioDelayPerDevice = true
@@ -419,6 +422,7 @@ object PlayerSettingsRepository {
             ?: AndroidLibmpvVideoOutput.GpuNext
         androidLibmpvHardwareDecodingEnabled = PlayerSettingsStorage.loadAndroidLibmpvHardwareDecodingEnabled() ?: true
         androidLibmpvYuv420pEnabled = PlayerSettingsStorage.loadAndroidLibmpvYuv420pEnabled() ?: false
+        androidLibmpvAnime4kEnabled = PlayerSettingsStorage.loadAndroidLibmpvAnime4kEnabled() ?: true
         androidExoChaptersEnabled = PlayerSettingsStorage.loadAndroidExoChaptersEnabled() ?: false
         chapterTitleEnabled = PlayerSettingsStorage.loadChapterTitleEnabled() ?: true
         rememberAudioDelayPerDevice = PlayerSettingsStorage.loadRememberAudioDelayPerDevice() ?: true
@@ -796,6 +800,14 @@ object PlayerSettingsRepository {
         androidLibmpvYuv420pEnabled = enabled
         publish()
         PlayerSettingsStorage.saveAndroidLibmpvYuv420pEnabled(enabled)
+    }
+
+    fun setAndroidLibmpvAnime4kEnabled(enabled: Boolean) {
+        ensureLoaded()
+        if (androidLibmpvAnime4kEnabled == enabled) return
+        androidLibmpvAnime4kEnabled = enabled
+        publish()
+        PlayerSettingsStorage.saveAndroidLibmpvAnime4kEnabled(enabled)
     }
 
     fun setAndroidExoChaptersEnabled(enabled: Boolean) {
@@ -1410,6 +1422,7 @@ object PlayerSettingsRepository {
             androidLibmpvVideoOutput = androidLibmpvVideoOutput,
             androidLibmpvHardwareDecodingEnabled = androidLibmpvHardwareDecodingEnabled,
             androidLibmpvYuv420pEnabled = androidLibmpvYuv420pEnabled,
+            androidLibmpvAnime4kEnabled = androidLibmpvAnime4kEnabled,
             androidExoChaptersEnabled = androidExoChaptersEnabled,
             chapterTitleEnabled = chapterTitleEnabled,
             rememberAudioDelayPerDevice = rememberAudioDelayPerDevice,

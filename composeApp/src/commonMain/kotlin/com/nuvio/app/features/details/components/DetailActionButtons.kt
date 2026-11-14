@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Animation
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CheckCircleOutline
@@ -46,6 +47,11 @@ import androidx.compose.ui.unit.dp
 import com.nuvio.app.core.ui.AppIconResource
 import com.nuvio.app.core.ui.appIconPainter
 import com.nuvio.app.core.ui.backdropControlColor
+import com.nuvio.app.features.details.MetaDetails
+import com.nuvio.app.features.playback.classification.AnimationToggleSurface
+import com.nuvio.app.features.playback.classification.label
+import com.nuvio.app.features.playback.classification.rememberAnimationToggle
+import com.nuvio.app.features.playback.classification.toTitleFacts
 import nuvio.composeapp.generated.resources.Res
 import nuvio.composeapp.generated.resources.action_play
 import nuvio.composeapp.generated.resources.details_actions_menu_label
@@ -257,7 +263,19 @@ fun DetailActions(
     onWatchedClick: () -> Unit,
     onSaveClick: () -> Unit,
     onSaveLongClick: (() -> Unit)?,
+    /** Title whose per-profile Animation toggle is shown (platforms with enhancements only). */
+    animationMeta: MetaDetails? = null,
 ) {
+    val animationToggle = animationMeta?.let { meta ->
+        rememberAnimationToggle(
+            metaId = meta.id,
+            metaType = meta.type,
+            displayTitle = meta.name,
+            facts = remember(meta) { meta.toTitleFacts() },
+            surface = AnimationToggleSurface.Details,
+        )
+    }
+    val animationToggleLabel = animationToggle?.label()
     val shuffleAction = onShuffleClick?.let { onClick ->
         DetailSecondaryAction(
             label = stringResource(if (shuffleEnabled) Res.string.shuffle_stop else Res.string.random_episode_title),
@@ -289,6 +307,16 @@ fun DetailActions(
                     onLongClick = onSaveLongClick,
                 ),
             )
+            if (animationToggle != null && animationToggleLabel != null) {
+                add(
+                    DetailSecondaryAction(
+                        label = animationToggleLabel,
+                        icon = Icons.Default.Animation,
+                        isActive = animationToggle.enabled,
+                        onClick = animationToggle::toggle,
+                    ),
+                )
+            }
         },
         isTablet = isTablet,
         onPlayClick = onPlayClick,

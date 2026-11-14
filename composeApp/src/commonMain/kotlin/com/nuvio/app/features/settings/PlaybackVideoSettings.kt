@@ -84,6 +84,15 @@ internal fun PlaybackVideoSettings(
                             isTablet = isTablet,
                             onCheckedChange = PlayerSettingsRepository::setAndroidLibmpvYuv420pEnabled,
                         )
+                        SettingsGroupDivider(isTablet = isTablet)
+                        SettingsSwitchRow(
+                            title = stringResource(Res.string.settings_playback_libmpv_anime4k),
+                            description = stringResource(Res.string.settings_playback_libmpv_anime4k_description),
+                            checked = settings.androidLibmpvAnime4kEnabled,
+                            enabled = libmpvOptionsEnabled,
+                            isTablet = isTablet,
+                            onCheckedChange = PlayerSettingsRepository::setAndroidLibmpvAnime4kEnabled,
+                        )
                     }
                     if (libmpvOptionsVisible) SettingsGroupDivider(isTablet = isTablet)
                     SettingsNavigationRow(

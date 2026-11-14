@@ -193,6 +193,13 @@ internal fun PlayerScreenRuntime.RenderPlayerRuntimeUi(
             )
         }
         val resolvedAutoEngine = resolvedAutoEngineState.value
+        // Upscaling follows the title's effective Animation eligibility and applies live.
+        val upscaleAnimation = if (enhancementPanelSupported) {
+            rememberPlayerAnimationToggle(parentMetaId, parentMetaType, title, playerMeta)
+                ?.state?.eligibility?.animeJaNai == true
+        } else {
+            false
+        }
 
         if (playerSurfaceSourceUrl != null) {
             key(playbackKey) {
@@ -213,6 +220,7 @@ internal fun PlayerScreenRuntime.RenderPlayerRuntimeUi(
                     initialPositionRequestKey = initialPositionRequestKey,
                     resizeMode = if (partyPanelInset > 0.dp) PlayerResizeMode.Fit else resizeMode,
                     playbackEngine = playbackEngineOverride ?: resolvedAutoEngine,
+                    animationUpscale = upscaleAnimation,
                     onInitialPositionHandled = { key, handled ->
                         if (active.value && playbackKey == activePlaybackKey && key == currentInitialPositionRequestKey()) {
                             initialSeekApplied = handled
@@ -409,6 +417,11 @@ private fun PlayerScreenRuntime.RenderPlayerControls(
             onVideoSettingsClick = if (isIos) {
                 {
                     showVideoSettingsModal = true
+                    controlsVisible = true
+                }
+            } else if (enhancementPanelSupported) {
+                {
+                    showEnhancementPanel = true
                     controlsVisible = true
                 }
             } else {
@@ -808,6 +821,13 @@ private fun PlayerScreenRuntime.RenderPlayerModals(displayedPositionMs: Long) {
             showSubmitIntroModal = false
         },
     )
+    if (enhancementPanelSupported) {
+        PlayerEnhancementPanel(
+            visible = showEnhancementPanel,
+            toggle = rememberPlayerAnimationToggle(parentMetaId, parentMetaType, title, playerMeta),
+            onDismiss = { showEnhancementPanel = false },
+        )
+    }
     StreamInfoOverlay(
         visible = showStreamInfo,
         addonName = activeProviderName,

@@ -87,6 +87,9 @@ import `is`.xyz.mpv.MPVNode
 import `is`.xyz.mpv.Utils
 import com.nuvio.tv.libass.media.widget.AssSubtitleSurfaceView
 import kotlinx.coroutines.delay
+import com.nuvio.app.features.playback.upscale.ActivePlaybackUpscale
+import com.nuvio.app.features.playback.upscale.UpscaleStatus
+import com.nuvio.app.features.playback.upscale.decideAnime4k
 import kotlinx.coroutines.Dispatchers
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Job
@@ -101,7 +104,8 @@ import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 
 private const val TAG = "NuvioPlayer"
-private const val PLAYER_DIAGNOSTIC_TAG = "NuvioPlayerDiag"
+internal const val PLAYER_DIAGNOSTIC_TAG = "NuvioPlayerDiag"
+private const val ANIME4K_STATS_INTERVAL_MS = 10_000L
 
 private class PlaybackDiagnostics {
     var prepareStartedAtMs: Long = 0L
@@ -124,6 +128,7 @@ actual fun PlatformPlayerSurface(
     initialPositionRequestKey: String?,
     resizeMode: PlayerResizeMode,
     playbackEngine: AndroidPlaybackEngine?,
+    animationUpscale: Boolean,
     useNativeController: Boolean,
     onInitialPositionHandled: (key: String, handled: Boolean) -> Unit,
     onControllerReady: (PlayerEngineController) -> Unit,
@@ -149,7 +154,17 @@ actual fun PlatformPlayerSurface(
     }
 
     when (activeEngine) {
-        ResolvedAndroidPlaybackEngine.ExoPlayer -> ExoPlayerSurface(
+        ResolvedAndroidPlaybackEngine.ExoPlayer -> {
+            // ExoPlayer has no shader stage: tell the panel why an Animation title is not upscaled.
+            val statusOwner = remember { Any() }
+            LaunchedEffect(animationUpscale) {
+                ActivePlaybackUpscale.publish(
+                    statusOwner,
+                    decideAnime4k(animationUpscale, playerSettings.androidLibmpvAnime4kEnabled, libmpv = false, null, null, false),
+                )
+            }
+            DisposableEffect(statusOwner) { onDispose { ActivePlaybackUpscale.clear(statusOwner) } }
+            ExoPlayerSurface(
             sourceUrl = sourceUrl,
             sourceAudioUrl = sourceAudioUrl,
             sourceHeaders = sourceHeaders,
@@ -168,6 +183,7 @@ actual fun PlatformPlayerSurface(
             onSnapshot = onSnapshot,
             onError = onError,
         )
+        }
         ResolvedAndroidPlaybackEngine.Libmpv -> {
             LaunchedEffect(initialPositionRequestKey) {
                 initialPositionRequestKey?.let { key ->
@@ -185,6 +201,8 @@ actual fun PlatformPlayerSurface(
                 videoOutput = playerSettings.androidLibmpvVideoOutput,
                 hardwareDecodingEnabled = playerSettings.androidLibmpvHardwareDecodingEnabled,
                 yuv420pEnabled = playerSettings.androidLibmpvYuv420pEnabled,
+                anime4kEnabled = playerSettings.androidLibmpvAnime4kEnabled,
+                animationUpscale = animationUpscale,
                 preferredSubtitleLanguage = playerSettings.preferredSubtitleLanguage,
                 onControllerReady = onControllerReady,
                 onSnapshot = onSnapshot,
@@ -1349,6 +1367,8 @@ private fun LibmpvPlayerSurface(
     videoOutput: AndroidLibmpvVideoOutput,
     hardwareDecodingEnabled: Boolean,
     yuv420pEnabled: Boolean,
+    anime4kEnabled: Boolean,
+    animationUpscale: Boolean,
     preferredSubtitleLanguage: String?,
     onControllerReady: (PlayerEngineController) -> Unit,
     onSnapshot: (PlayerPlaybackSnapshot) -> Unit,
@@ -1444,9 +1464,11 @@ private fun LibmpvPlayerSurface(
         val observer = object : MPV.EventObserver {
             override fun eventProperty(property: String) {
                 if (property == "sub-text" || property == "sid") view.updateStyledSubtitle()
+                if (property == "video-params/h") view.reevaluateUpscale()
             }
             override fun eventProperty(property: String, value: Long) {
                 if (property == "sid") view.updateStyledSubtitle()
+                if (property == "video-params/h") view.reevaluateUpscale()
                 if (property == "cache-buffering-state") {
                     dispatchSnapshot(updateKeepScreenOn = true)
                 }
@@ -1643,6 +1665,20 @@ private fun LibmpvPlayerSurface(
         playerViewRef?.applyResizeMode(resizeMode)
     }
 
+    // A changed Animation choice applies to the playing stream without reloading it.
+    LaunchedEffect(playerViewRef, animationUpscale) {
+        playerViewRef?.setUpscaleRequested(animationUpscale)
+    }
+
+    // Measured in-app cost while Anime4K runs (logcat only; nothing is sent anywhere).
+    LaunchedEffect(playerViewRef) {
+        val view = playerViewRef ?: return@LaunchedEffect
+        while (isActive) {
+            delay(ANIME4K_STATS_INTERVAL_MS)
+            view.logUpscaleStats()
+        }
+    }
+
     LaunchedEffect(playerViewRef, sourceUrl, sourceAudioUrl, sanitizedSourceHeaders, externalSubtitles) {
         val view = playerViewRef ?: return@LaunchedEffect
         onControllerReady(
@@ -1673,6 +1709,7 @@ private fun LibmpvPlayerSurface(
                     videoOutput = videoOutput,
                     hardwareDecodingEnabled = hardwareDecodingEnabled,
                     yuv420pEnabled = yuv420pEnabled,
+                    anime4kEnabled = anime4kEnabled,
                 ).apply {
                     layoutParams = android.view.ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
                     keepScreenOn = false
@@ -1692,6 +1729,7 @@ private fun LibmpvPlayerSurface(
             },
             onRelease = { view ->
                 if (playerViewRef === view) playerViewRef = null
+                ActivePlaybackUpscale.clear(view)
                 view.releaseMpv()
             },
         )
@@ -1711,7 +1749,82 @@ private class NuvioLibmpvView(
     videoOutput: AndroidLibmpvVideoOutput,
     private val hardwareDecodingEnabled: Boolean,
     private val yuv420pEnabled: Boolean,
+    private val anime4kEnabled: Boolean,
 ) : MpvSurfaceView(context, videoOutput.mpvValue) {
+    private val videoOutputName = videoOutput.mpvValue
+
+    // Anime4K state, touched only on the mpv thread.
+    private var upscaleRequested = false
+    private var appliedShader: String? = null
+    private var lastUpscaleStatus: UpscaleStatus? = null
+
+    fun setUpscaleRequested(requested: Boolean) {
+        executeMpv {
+            upscaleRequested = requested
+            reevaluateUpscaleNow()
+        }
+    }
+
+    fun reevaluateUpscale() {
+        executeMpv { reevaluateUpscaleNow() }
+    }
+
+    /** Picks the profile for the decoded source size and swaps `glsl-shaders` live when it changes. */
+    private fun reevaluateUpscaleNow() {
+        val width = mpv.getPropertyInt("video-params/w")
+        val height = mpv.getPropertyInt("video-params/h")
+        val range = mpv.videoDynamicRange()
+        val highDynamicRange = range != null && range != VideoDynamicRange.Sdr
+        var status = decideAnime4k(upscaleRequested, anime4kEnabled, libmpv = true, width, height, highDynamicRange)
+        val shader = status.profile?.let { profile ->
+            runCatching { Anime4kShaderFiles.pathFor(context, profile) }
+                .onFailure { error ->
+                    Log.w(TAG, "Anime4K shader install failed", error)
+                    status = UpscaleStatus(
+                        UpscaleStatus.Kind.Failed,
+                        profile,
+                        sourceWidth = width,
+                        sourceHeight = height,
+                        error = error.message ?: error.javaClass.simpleName,
+                    )
+                }
+                .getOrNull()
+        }
+        if (shader != appliedShader) {
+            // An empty list clears the shaders; mpv rebuilds the render chain without reloading the file.
+            mpv.setPropertyString("glsl-shaders", shader.orEmpty())
+            appliedShader = shader
+        }
+        if (status != lastUpscaleStatus) {
+            lastUpscaleStatus = status
+            logAnime4k(
+                "anime4k_status kind=${status.kind} profile=${status.profile} reason=${status.skipReason} " +
+                    "src=${width}x$height vo=$videoOutputName",
+            )
+        }
+        if (!released.get()) ActivePlaybackUpscale.publish(this, status)
+    }
+
+    /** One logcat line with mpv's measured render cost while Anime4K is applied. */
+    fun logUpscaleStats() {
+        executeMpv {
+            val status = lastUpscaleStatus ?: return@executeMpv
+            if (appliedShader == null) return@executeMpv
+            val passes = voPassTotalsMs(mpv.getPropertyNode("vo-passes"))
+            logAnime4k(
+                "anime4k_stats profile=${status.profile} src=${status.sourceWidth}x${status.sourceHeight} " +
+                    "vo=$videoOutputName hwdec=${mpv.getPropertyString("hwdec-current")} " +
+                    "renderAvgMs=${passes?.first?.let { "%.2f".format(it) }} " +
+                    "renderPeakMs=${passes?.second?.let { "%.2f".format(it) }} " +
+                    "voDrops=${mpv.getPropertyInt("frame-drop-count")} " +
+                    "decoderDrops=${mpv.getPropertyInt("decoder-frame-drop-count")} " +
+                    "delayed=${mpv.getPropertyInt("vo-delayed-frame-count")} " +
+                    "mistimed=${mpv.getPropertyInt("mistimed-frame-count")} " +
+                    "vfFps=${mpv.getPropertyDouble("estimated-vf-fps")?.let { "%.2f".format(it) }} " +
+                    "containerFps=${mpv.getPropertyDouble("container-fps")?.let { "%.3f".format(it) }}",
+            )
+        }
+    }
     private var currentSourceUrl: String? = null
     private var currentSourceAudioUrl: String? = null
     private var currentRequestHeaders: Map<String, String> = emptyMap()
@@ -1789,6 +1902,7 @@ private class NuvioLibmpvView(
             "track-list" to MPV.mpvFormat.MPV_FORMAT_NODE,
             "sid" to MPV.mpvFormat.MPV_FORMAT_INT64,
             "sub-text" to MPV.mpvFormat.MPV_FORMAT_STRING,
+            "video-params/h" to MPV.mpvFormat.MPV_FORMAT_INT64,
         )
         props.forEach { (name, format) -> mpv.observeProperty(name, format) }
     }

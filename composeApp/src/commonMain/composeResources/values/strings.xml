@@ -1208,6 +1208,8 @@
     <string name="settings_playback_libmpv_hardware_decoding_description">Use mpv hardware decoding when available.</string>
     <string name="settings_playback_libmpv_yuv420p">libmpv YUV420P Compatibility</string>
     <string name="settings_playback_libmpv_yuv420p_description">Force YUV420P output for devices with renderer or color issues.</string>
+    <string name="settings_playback_libmpv_anime4k">Anime4K upscaling</string>
+    <string name="settings_playback_libmpv_anime4k_description">Upscale titles marked Animation with Anime4K in libmpv: Quality for 720p sources, Fast for 1080p. Larger and HDR sources are not upscaled.</string>
     <string name="settings_playback_section_next_episode">NEXT EPISODE</string>
     <string name="settings_playback_section_player">PLAYER</string>
     <string name="settings_playback_section_skip_segments">SKIP SEGMENTS</string>
@@ -2602,4 +2604,22 @@
     <string name="subtitle_shadow_opacity">Shadow opacity</string>
     <string name="subtitle_shadow_size">Shadow size</string>
     <string name="subtitle_reset_appearance">Reset appearance</string>
+    <string name="animation_toggle_on">Animation: On</string>
+    <string name="animation_toggle_off">Animation: Off</string>
+    <string name="animation_toggle_suggested_on">Animation: On (suggested)</string>
+    <string name="animation_toggle_suggested_off">Animation: Off (suggested)</string>
+    <string name="animation_toggle_title">Animation</string>
+    <string name="animation_toggle_explicit_desc">Set by you for this title</string>
+    <string name="animation_toggle_suggested_desc">Suggested from title metadata</string>
+    <string name="player_enhancements_title">Enhancements</string>
+    <string name="player_upscale_off">Anime4K: Off</string>
+    <string name="player_upscale_pending">Anime4K: Waiting for video</string>
+    <string name="player_upscale_active_fast">Anime4K: Fast</string>
+    <string name="player_upscale_active_quality">Anime4K: Quality</string>
+    <string name="player_upscale_skipped">Anime4K: Skipped</string>
+    <string name="player_upscale_failed">Anime4K: Failed</string>
+    <string name="player_upscale_reason_disabled">Anime4K upscaling is off in playback settings.</string>
+    <string name="player_upscale_reason_exoplayer">Anime4K needs the libmpv player engine.</string>
+    <string name="player_upscale_reason_hdr">HDR and Dolby Vision sources are not upscaled.</string>
+    <string name="player_upscale_reason_large">Sources above 1080p are not upscaled.</string>
 </resources>

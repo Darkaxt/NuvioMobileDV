@@ -86,9 +86,11 @@ internal expect object PlayerSettingsStorage {
     fun loadAndroidLibmpvHardwareDecodingEnabled(): Boolean?
     fun saveAndroidLibmpvHardwareDecodingEnabled(enabled: Boolean)
     fun loadAndroidLibmpvYuv420pEnabled(): Boolean?
+    fun loadAndroidLibmpvAnime4kEnabled(): Boolean?
     fun loadAndroidExoChaptersEnabled(): Boolean?
     fun loadChapterTitleEnabled(): Boolean?
     fun saveAndroidLibmpvYuv420pEnabled(enabled: Boolean)
+    fun saveAndroidLibmpvAnime4kEnabled(enabled: Boolean)
     fun saveAndroidExoChaptersEnabled(enabled: Boolean)
     fun saveChapterTitleEnabled(enabled: Boolean)
     fun loadRememberAudioDelayPerDevice(): Boolean?

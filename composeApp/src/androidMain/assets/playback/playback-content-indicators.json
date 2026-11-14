@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 2,
+  "ruleSetVersion": 2,
+  "status": "packaged-and-loaded-by-windows-app",
+  "normalization": {
+    "strings": "trim-casefold-collapse-whitespace-exact-match",
+    "fields": {
+      "categories": "Stable title-level Nuvio category membership, preserved across launch routes",
+      "genres": "Structured title genre identifiers mapped to canonical names",
+      "services": "Title-level services or provider references, not the selected stream addon",
+      "networks": "Structured title network identifiers mapped to canonical names",
+      "originCountries": "ISO 3166-1 alpha-2 title origin countries",
+      "studios": "Structured title production companies, not streaming availability",
+      "contentType": "movie or series"
+    },
+    "aliases": {
+      "networks": { "tokyo mx": ["TOKYO MX", "Tokyo Metropolitan Television"] },
+      "services": { "crunchyroll": ["Crunchyroll"] }
+    }
+  },
+  "precedence": [
+    "explicit-profile-title-animation-boolean-is-final",
+    "automatic-animejanai-exclusions-affect-suggestion-only",
+    "positive-animation-indicators",
+    "unknown-does-not-automatically-enable-either-enhancement"
+  ],
+  "animationIndicators": [
+    {
+      "id": "nuvio-anime-category",
+      "enabled": true,
+      "matchAll": [{ "field": "categories", "anyOf": ["anime"] }],
+      "animation": true
+    },
+    {
+      "id": "animation-genre",
+      "enabled": true,
+      "matchAll": [{ "field": "genres", "anyOf": ["animation"] }],
+      "animation": true
+    },
+    {
+      "id": "crunchyroll-title-reference",
+      "enabled": true,
+      "matchAll": [{ "field": "services", "anyOf": ["crunchyroll"] }],
+      "animation": true
+    },
+    {
+      "id": "tokyo-mx-japanese-origin",
+      "enabled": true,
+      "matchAll": [
+        { "field": "networks", "anyOf": ["tokyo mx"] },
+        { "field": "originCountries", "anyOf": ["jp"] }
+      ],
+      "animation": true
+    }
+  ],
+  "automaticAnimeJaNaiExclusions": [
+    {
+      "id": "disney-produced-animated-movie",
+      "enabled": true,
+      "requiresAnimationEvidence": true,
+      "matchAll": [
+        { "field": "contentType", "anyOf": ["movie"] },
+        {
+          "field": "studios",
+          "anyOf": [
+            "disney",
+            "walt disney pictures",
+            "walt disney animation studios",
+            "walt disney productions",
+            "disneytoon studios",
+            "pixar",
+            "pixar animation studios"
+          ]
+        }
+      ],
+      "suggestedAnimationToggle": false,
+      "preserveAnimationEvidenceForSvpExclusion": true,
+      "explicitUserChoiceOverrides": true
+    }
+  ],
+  "supportingEvidenceOnly": [
+    { "id": "japanese-origin-alone", "field": "originCountries", "anyOf": ["jp"] }
+  ],
+  "review": {
+    "ledgerFormat": "profile-scoped-append-only-jsonl",
+    "recordOn": ["first-explicit-user-choice", "explicit-user-choice-change"],
+    "recordMatchedRuleIdsAndRuleSetHash": true,
+    "automaticRuleRewriting": false,
+    "overwriteExplicitChoicesOnRuleUpdate": false
+  }
+}
