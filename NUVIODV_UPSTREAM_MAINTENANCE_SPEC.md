@@ -4,6 +4,67 @@ Authorization: `already_authorized` by the user on 2026-09-12.
 
 ## Requirements
 
+### 2026-11-14 maintenance and issue delta
+
+Android was synchronized at the initial check: clean local fast-forward to
+`406f88814`, with zero missing commits from inspected upstream `ba149964c`. Daily sync `43590697115`
+and normal signed release `v0.6.12-nuviodv.7` / run `43591048141` are successful.
+Preserve the existing qualified Android AAR and shipped Anime4K settings/behavior;
+unchanged native artifacts do not require another native build. Final refresh
+then found 18 newly arrived commits at upstream `6b7f15e40`. Integrating and
+verifying that newer tip and its normal application release remain ACTIVE;
+the earlier synchronized observation does not satisfy this later source boundary.
+Android library `27bde9f7` contains inspected FortunasXP tip `fee434bfc` and its
+successful AAR delivery run remains `42532012258`.
+
+Late-sync source is integrated as `0.6.13-nuviodv.1` / `12268`: upstream loading
+stages coexist with fork stream metrics; upstream mapped profile state retains
+animation preload. The new benchmark/non-minified variants and generator target
+`com.darkaxt.nuviodv.benchmark`, preserving production/debug fork identity and
+avoiding upstream benchmark collisions. Workflows and the AAR hash remain exact.
+Vietnamese line-ending normalization preserves parsed XML values. Portable
+version/sync/RPDB/authentication contracts pass. Local readiness
+`ae467df644da00af38823dd07a6ef505`, workflow `579d44b4e9c942769e028cc710d7c8bc`,
+passes focused loading/Anime4K tests and the full integrated debug APK with native
+exit 0 and verified whole-tree exit. The shared Gradle gate used two workers,
+no parallel projects, 3 GiB Gradle/Kotlin daemon heaps and one 512 MiB test fork;
+peak aggregate working set was 7687708672 bytes, with no memory failure or budget
+increase. Kotlin 2.4.10 retains the established daemon strategy. An initial shell
+contract probe resolved Windows' WSL `bash.exe` and exited 126; the explicit Git
+Bash runtime passes the same contracts. No WSL build was run.
+
+Debug APK SHA-256 `f491919d27fe928db247f51537cf1f15e335022d7d290fd2d9d4a3125440986e`
+has the correct package/name/code/label and ARM64-only patched player with both
+libdovi exports. Nine AAR libraries are byte-identical, including libmpv
+`1c5bf5e2256b3a20fb41617cbd5d47b017d821c512f8dc850d88e617c1d0f8f8`.
+The C++ runtime differs only through AGP symbol stripping: merged-native bytes
+match AAR `0c52cfab...`, stripped-native bytes match APK `c4c2fe5c...`, and every
+allocated ELF section matches the original. This diagnostic mismatch required no
+production change. The signed Linux full-suite/release and independent public APK
+verification remain required before Android delivery is complete.
+
+The open-issue API delta since `2026-11-11T21:31:00Z` returned 31 entries in its
+complete first page (fewer than the requested 100): 18 issues and 13 pull requests.
+Issue bodies and all comments on the six commented issues were reviewed. Baselines
+#1730, #1675, #1723, #2444, #2391, #2395, #1956, #1972 and #2574 have no post-cutoff
+updates. #1730 remains the high-relevance historical descriptor-exhaustion baseline;
+#1675/#1723 provide no new evidence connecting them to this fork's native path.
+No new DV/libplacebo/GPU-next/hardware-decoder/pink-output or long-playback failure
+evidence was found. #2655 requests a Sinhala subtitle font without a crash or
+native-pipeline trace. #2661 is an unverified code-review claim about offline
+progress uploads, and #2662 concerns missing bingeGroup source matching, observed
+on iOS; neither establishes a native rendering failure. Other updates concern UI,
+catalog order, provider proposals and download features. No issue-driven patch or
+upstream comment was made. Next delta cutoff: `2026-11-14T23:21:00Z`, deliberately
+slightly overlapping this retrieval so issues updated during review are not lost.
+
+Existing heartbeat `maintain-nuviodv-upstream-fork` was updated in place to preserve
+the already shipped Windows AnimeJaNai/SVP and Android Anime4K behavior, current
+native feature checkout and exact application pins. Read-back verifies the same
+active three-day cadence, target chat and quiet no-change notification intent.
+Desktop/native delivery and cleanup evidence are recorded in the November 14
+section of `NUVIODESKTOP_PARITY_SPEC.md` in the Desktop checkout.
+
 ### 2026-11-11 Android maintenance delivery
 
 Merge `ac06ad0e2` integrates inspected upstream `4135f96cd` (0.6.12). It resolves
