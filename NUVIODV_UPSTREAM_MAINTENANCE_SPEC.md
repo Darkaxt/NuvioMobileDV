@@ -11,9 +11,9 @@ Android was synchronized at the initial check: clean local fast-forward to
 and normal signed release `v0.6.12-nuviodv.7` / run `43591048141` are successful.
 Preserve the existing qualified Android AAR and shipped Anime4K settings/behavior;
 unchanged native artifacts do not require another native build. Final refresh
-then found 18 newly arrived commits at upstream `6b7f15e40`. Integrating and
-verifying that newer tip and its normal application release remain ACTIVE;
-the earlier synchronized observation does not satisfy this later source boundary.
+then found 18 newly arrived commits at upstream `6b7f15e40`. That later source
+boundary is now integrated and delivered by `1c1847736` as the normal release
+`v0.6.13-nuviodv.1`; final refresh confirms zero missing upstream commits.
 Android library `27bde9f7` contains inspected FortunasXP tip `fee434bfc` and its
 successful AAR delivery run remains `42532012258`.
 
@@ -40,8 +40,23 @@ libdovi exports. Nine AAR libraries are byte-identical, including libmpv
 The C++ runtime differs only through AGP symbol stripping: merged-native bytes
 match AAR `0c52cfab...`, stripped-native bytes match APK `c4c2fe5c...`, and every
 allocated ELF section matches the original. This diagnostic mismatch required no
-production change. The signed Linux full-suite/release and independent public APK
-verification remain required before Android delivery is complete.
+production change. Android application delivery is COMPLETE: authenticated run
+`43654900049` passes the full Linux host suite, signing, generated configuration,
+package/native checks and normal publication from exact source
+`1c1847736779dcf9389fe454c3bef416bf37c75e`.
+
+The independently downloaded public APK is SHA-256
+`cb631f31fb6a10498cd5ed243a8db1c5cb7097eed659fba2383a9ce3ac3323a5`, matching
+GitHub's asset digest and release notes. Actual package/label/name/code, ARM64-only
+payload, existing signer `1FB94424753A90F993C678B6FA4322579253BB303F22C335DB395A9E2557D571`
+and v2 signature pass. All ten public native library hashes match the pinned AAR
+(the public C++ runtime is unstripped). Both libdovi exports, fork updater and
+packaged SIMKL/MDBList/Trakt client hashes pass. All 62 retained mobile releases
+are normal and the latest endpoint resolves to this exact release. The daily
+sync remains successful; wrapper AAR delivery remains unexpired. No Android
+device was accessed or device playback validation claimed. The exact completed
+local gate scratch was removed via reviewed transaction
+`d06866618e44d001da5601dc918610fb` (10 members / 3362963 bytes).
 
 The open-issue API delta since `2026-11-11T21:31:00Z` returned 31 entries in its
 complete first page (fewer than the requested 100): 18 issues and 13 pull requests.
@@ -64,6 +79,11 @@ native feature checkout and exact application pins. Read-back verifies the same
 active three-day cadence, target chat and quiet no-change notification intent.
 Desktop/native delivery and cleanup evidence are recorded in the November 14
 section of `NUVIODESKTOP_PARITY_SPEC.md` in the Desktop checkout.
+All four monitored branches contain their final inspected upstream tips. Final
+reviewed transaction `8765ae50f6f55f7b288f5c7c83b53ece` removes the spent E: copies
+and exact local preflight MSI/debug APK (60 members / 741102037 bytes), with no
+exclusions or residuals. Public releases and installed Windows state are verified;
+no maintenance blocker or tracked deferral remains.
 
 ### 2026-11-11 Android maintenance delivery
 
