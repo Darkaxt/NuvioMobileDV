@@ -71,27 +71,14 @@ jobs:
           merge_status=$?
           set -e
 
-          if [[ "${merge_status}" -ne 0 ]]; then
-            mapfile -t conflicts < <(git diff --name-only --diff-filter=U)
-            if [[ "${#conflicts[@]}" -ne 1 ]] || \
-               ! [[ "${conflicts[0]}" == "${allowed_conflict}" ]]; then
-              printf 'Upstream merge requires manual conflict resolution:\n' >&2
-              printf '  %s\n' "${conflicts[@]}" >&2
-              git merge --abort
-              exit 1
-            fi
-            git checkout --ours -- "${allowed_conflict}"
-            git add "${allowed_conflict}"
+          if [[ "${merge_status}" -ne 0 ]] && \
+             ! git rev-parse -q --verify MERGE_HEAD >/dev/null; then
+            echo 'Git failed before creating a merge; refusing to advance the fork.' >&2
+            exit "${merge_status}"
           fi
 
-          mapfile -t unresolved < <(git diff --name-only --diff-filter=U)
-          if [[ "${#unresolved[@]}" -ne 0 ]]; then
-            printf 'Unresolved merge conflicts remain:\n' >&2
-            printf '  %s\n' "${unresolved[@]}" >&2
-            git merge --abort
-            exit 1
-          fi
-
+          # Fork workflow ownership applies even when Git reports a conflict.
+          # Restore these paths before inspecting application/version conflicts.
           mapfile -t workflow_changes < <(
             git diff --name-only "${pre_merge_head}" -- .github/workflows
           )
@@ -102,6 +89,28 @@ jobs:
               git rm -- "${workflow_path}"
             fi
           done
+
+          if [[ "${merge_status}" -ne 0 ]]; then
+            mapfile -t conflicts < <(git diff --name-only --diff-filter=U)
+            if [[ "${#conflicts[@]}" -eq 1 ]] && \
+               [[ "${conflicts[0]}" == "${allowed_conflict}" ]]; then
+              git checkout --ours -- "${allowed_conflict}"
+              git add "${allowed_conflict}"
+            elif [[ "${#conflicts[@]}" -ne 0 ]]; then
+              printf 'Upstream merge requires manual conflict resolution:\n' >&2
+              printf '  %s\n' "${conflicts[@]}" >&2
+              git merge --abort
+              exit 1
+            fi
+          fi
+
+          mapfile -t unresolved < <(git diff --name-only --diff-filter=U)
+          if [[ "${#unresolved[@]}" -ne 0 ]]; then
+            printf 'Unresolved merge conflicts remain:\n' >&2
+            printf '  %s\n' "${unresolved[@]}" >&2
+            git merge --abort
+            exit 1
+          fi
 
       - name: Advance the NuvioDV release version
         if: steps.upstream.outputs.has_updates == 'true'

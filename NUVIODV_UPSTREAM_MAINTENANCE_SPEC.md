@@ -4,6 +4,66 @@ Authorization: `already_authorized` by the user on 2026-09-12.
 
 ## Requirements
 
+### 2026-11-17 Android maintenance (ACTIVE)
+
+The November 17 cross-repository ledger is in Desktop
+`NUVIODESKTOP_PARITY_SPEC.md`. Existing heartbeat authority covers the complete
+normal delivery. Start state was clean, fast-forwarded to already delivered
+`949e6a5df` / `0.6.13-nuviodv.2`. Daily sync `44094106133` failed before compilation
+on application, version and upstream workflow conflicts. Inspected upstream is
+`b2e3d67ba` / `1.1.0-beta.1` (66 commits). Its prerelease suffix describes the
+upstream source; this personal fork still publishes only normal releases.
+
+Bounded sync corrections: restore owned workflow files before classifying merge
+conflicts, continuing to abort on any application conflict; normalize valid
+upstream prerelease names to their semantic core for the normal fork version.
+Real Git fixture regression reproduces the workflow conflict failure while its
+application-conflict variant still fails closed. Version regression reproduces
+rejection of `1.1.0-beta.1`. Both corrections retain existing helpers and need no
+new architectural layer. Release version becomes `1.1.0-nuviodv.1` / `12270`.
+The workflow regression also proves that a missing upstream ref / failure before
+Git creates MERGE_HEAD remains an error. This CI-only guard correction does not
+change Android compiled inputs; repeat the source contracts without rebuilding
+unchanged application code solely for workflow text.
+
+Upstream also migrated its Maven mpv wrapper to 0.2.1. The fork retains the exact
+qualified AAR / 0.1.12 API and its create/init/destroy lifecycle, pre-init process
+safety options and shader behavior; do not adopt constructor/cache/close calls
+from the newer wrapper. Retain upstream subtitle-cue improvements, Plex/Silo
+artwork/provider changes, realistic watched fixtures and all other non-workflow
+history. RPDB, episode-artwork priority/queue, local credentials, identity,
+classification choices and Anime4K remain required invariants.
+
+All source paths must be reconciled before the managed focused Android tests and
+integrated full debug APK. Final signed workflow must also pass the complete
+Linux host suite and generated runtime configuration checks. Independently check
+the normal release/tag/source, downloaded APK hash, signer/package/version/code,
+provider identifiers, updater and pinned native payload. No Android endpoint is
+required or authorized implicitly by this maintenance verification.
+
+Integrated validation now passes: readiness `47acc861fd6a543dcef6d15f611b7686`,
+original workflow `d8619b22d418e8b423a1e1427fc7b047`, native exit 0 / verified
+whole-tree and daemon exit. Adapter independently reports acquisition of
+`Local\Darka.AndroidGradleBuildGate`, observed two workers/no parallel projects
+and a 3 GiB Gradle heap, configured 3 GiB Kotlin daemon heap, one 512 MiB test
+fork, no memory failure; peak aggregate working set 5385572352 bytes. Same
+Kotlin 2.4.10 toolchain retains its established daemon strategy. Regular Python
+is selected only in this workload's PATH because the ambient `python` now resolves
+to SVP's isolated embedded distribution; no global environment was changed.
+
+Only the CI regression/merge guard and documentation changed after readiness;
+hash comparison proves every compiled application input is unchanged. Final
+portable contracts pass, so no duplicate app compilation is required for that
+CI-only correction. Local full APK SHA-256
+`ddac58b2b071a1f1a169be49a87b80431916b550d0a202c9d82399e91ca940be`
+has the expected package/version/code/label, ARM64-only player and both libdovi
+exports. Nine pinned libraries match byte-for-byte; AGP's stripped local C++
+runtime retains every allocated ELF section. Gate-owned native caches were
+reclaimed by Coordinator after process exit, and its remaining three spent log
+members / 157474 bytes were removed immediately through reviewed transaction
+`60aaa0886477deb7ec9f991da22e96dd`. Signed full-suite CI, normal publication and
+independent public APK verification remain required before stage closure.
+
 ### 2026-11-14 maintenance and issue delta
 
 Android was synchronized at the initial check: clean local fast-forward to

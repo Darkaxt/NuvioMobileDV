@@ -6,6 +6,25 @@ from advance_nuviodv_version import advance_version_file, compute_next_version
 
 
 class AdvanceNuvioDvVersionTest(unittest.TestCase):
+    def test_upstream_prerelease_uses_its_base_in_a_normal_fork_version(self) -> None:
+        self.assertEqual(
+            compute_next_version(current_name="0.6.13-nuviodv.2", current_code=12269,
+                                 upstream_name="1.1.0-beta.1", upstream_code=158),
+            ("1.1.0-nuviodv.1", 12270),
+        )
+
+    def test_stable_transition_at_the_same_base_advances_only_the_fork_counter(self) -> None:
+        self.assertEqual(
+            compute_next_version(current_name="1.1.0-nuviodv.1", current_code=12270,
+                                 upstream_name="1.1.0", upstream_code=159),
+            ("1.1.0-nuviodv.2", 12271),
+        )
+
+    def test_rejects_a_malformed_upstream_prerelease(self) -> None:
+        with self.assertRaises(ValueError):
+            compute_next_version(current_name="0.6.13-nuviodv.2", current_code=12269,
+                                 upstream_name="1.1.0-beta..1", upstream_code=158)
+
     def test_advances_fork_counter_when_upstream_base_is_unchanged(self) -> None:
         self.assertEqual(
             compute_next_version(

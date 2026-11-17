@@ -8,7 +8,8 @@ NUVIODV_VERSION = re.compile(
     r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)-nuviodv\.(?P<fork>0|[1-9]\d*)$"
 )
 UPSTREAM_VERSION = re.compile(
-    r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)$"
+    r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)"
+    r"(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$"
 )
 
 
@@ -28,7 +29,7 @@ def compute_next_version(
         raise ValueError(f"Current version is not a NuvioDV version: {current_name}")
     upstream_match = UPSTREAM_VERSION.fullmatch(upstream_name.strip())
     if upstream_match is None:
-        raise ValueError(f"Upstream version is not a plain semantic version: {upstream_name}")
+        raise ValueError(f"Upstream version is not a semantic version: {upstream_name}")
 
     current_core = parse_core(current_match)
     upstream_core = parse_core(upstream_match)

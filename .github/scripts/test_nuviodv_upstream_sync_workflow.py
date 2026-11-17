@@ -1,4 +1,9 @@
 import hashlib
+import os
+import shutil
+import subprocess
+import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 
@@ -75,6 +80,64 @@ class NuvioDvUpstreamSyncWorkflowTest(unittest.TestCase):
         self.assertIn('git diff --name-only "${pre_merge_head}" -- .github/workflows', self.workflow)
         self.assertIn('git checkout "${pre_merge_head}" -- "${workflow_path}"', self.workflow)
         self.assertIn('git rm -- "${workflow_path}"', self.workflow)
+
+    def test_real_workflow_conflict_is_preserved_before_application_conflicts_are_checked(self) -> None:
+        step = self.workflow.split('      - name: Merge upstream history', 1)[1]
+        step = step.split('      - name: Advance the NuvioDV release version', 1)[0]
+        script = textwrap.dedent(step.split('        run: |\n', 1)[1])
+        bash = (str(Path(os.environ.get('ProgramFiles', r'C:\Program Files')) / 'Git/bin/bash.exe')
+                if os.name == 'nt' else shutil.which('bash'))
+        self.assertTrue(bash)
+        cases = ((False, False, False), (False, True, False), (True, True, False), (False, False, True))
+        for application_conflict, version_conflict, missing_tip in cases:
+            with self.subTest(application_conflict=application_conflict, version_conflict=version_conflict, missing_tip=missing_tip), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder)
+                repo = root / 'repo'
+                repo.mkdir()
+                def git(*args: str) -> str:
+                    return subprocess.check_output(['git', '-C', str(repo), *args], text=True).strip()
+                git('init', '-b', 'main')
+                git('config', 'user.name', 'NuvioDV contract')
+                git('config', 'user.email', 'contract@example.invalid')
+                workflow = repo / '.github/workflows/android-release.yml'
+                version = repo / 'iosApp/Configuration/Version.xcconfig'
+                workflow.parent.mkdir(parents=True)
+                version.parent.mkdir(parents=True)
+                workflow.write_text('base workflow\n')
+                version.write_text('base version\n')
+                (repo / 'app.txt').write_text('base application\n')
+                git('add', '.')
+                git('commit', '-m', 'base')
+                base = git('rev-parse', 'HEAD')
+                workflow.write_text('fork workflow\n')
+                version.write_text('fork version\n')
+                if application_conflict:
+                    (repo / 'app.txt').write_text('fork application\n')
+                git('add', '.')
+                git('commit', '-m', 'fork')
+                fork = git('rev-parse', 'HEAD')
+                git('checkout', '--detach', base)
+                workflow.write_text('upstream workflow\n')
+                if version_conflict:
+                    version.write_text('upstream version\n')
+                (repo / 'app.txt').write_text('upstream application\n')
+                git('add', '.')
+                git('commit', '-m', 'upstream')
+                if not missing_tip:
+                    git('update-ref', 'refs/remotes/upstream/cmp-rewrite', 'HEAD')
+                git('checkout', 'main')
+                (root / 'merge.sh').write_text(script, newline='\n')
+                result = subprocess.run([bash, '../merge.sh'], cwd=repo, capture_output=True, text=True)
+                self.assertEqual(1 if application_conflict or missing_tip else 0, result.returncode, result.stdout + result.stderr)
+                self.assertEqual('fork workflow\n', workflow.read_text())
+                self.assertEqual('fork version\n', version.read_text())
+                self.assertEqual(fork, git('rev-parse', 'HEAD'))
+                if application_conflict or missing_tip:
+                    self.assertEqual('fork application\n' if application_conflict else 'base application\n', (repo / 'app.txt').read_text())
+                    self.assertFalse((repo / '.git/MERGE_HEAD').exists())
+                else:
+                    self.assertEqual('upstream application\n', (repo / 'app.txt').read_text())
+                    self.assertFalse(git('diff', '--name-only', '--diff-filter=U'))
 
     def test_verifies_the_fork_before_push(self) -> None:
         self.assertIn("test_advance_nuviodv_version.py", self.workflow)
