@@ -41,6 +41,18 @@ PLAYER_TIMELINE = PLAYER_CONTROLS.with_name("PlayerTimeline.kt")
 
 
 class NuvioDvUpstreamSyncWorkflowTest(unittest.TestCase):
+    def test_every_tracked_submodule_has_a_url_mapping(self) -> None:
+        entries = subprocess.check_output(['git', 'ls-files', '--stage'], cwd=REPOSITORY_ROOT, text=True).splitlines()
+        gitlinks = {entry.split('\t', 1)[1] for entry in entries if entry.startswith('160000 ')}
+        paths = subprocess.check_output(['git', 'config', '--file', '.gitmodules', '--get-regexp',
+            r'^submodule\..*\.path$'], cwd=REPOSITORY_ROOT, text=True).splitlines()
+        configured = {}
+        for line in paths:
+            key, path = line.split(' ', 1)
+            configured[path] = subprocess.check_output(['git', 'config', '--file', '.gitmodules',
+                '--get', key.removesuffix('.path') + '.url'], cwd=REPOSITORY_ROOT, text=True).strip()
+        self.assertEqual(set(), gitlinks - {path for path, url in configured.items() if url})
+
     def test_release_requires_complete_android_host_suite_on_linux(self) -> None:
         command = './gradlew :composeApp:testAndroidHostTest'
         self.assertIn(command, self.release_workflow)

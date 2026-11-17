@@ -76,6 +76,20 @@ successful and inspected upstream remains contained. No device access or device
 playback validation is claimed. Remaining cross-repository maintenance is tracked
 in the Desktop ledger rather than treated as Android delivery work.
 
+Final reconciliation M1 repairs a separate evidenced checkout-cleanup defect.
+The actual recursive Git cleanup command exits 128 on unused orphan gitlink
+`libass-android`; a new index/mapping regression additionally identifies
+`vendor/quickjs-kt` and `vendor/TorrServer`. Their uninitialized directories are
+empty and no build configuration includes those source roots. Actual dependency
+resolution continues through bundled AARs / declared artifacts. Remove only the
+three unused index pointers, preserving all working directories, AARs and the
+legitimate MPVKit mapping. The regression fails before correction, then the actual
+recursive Git command and all portable source/authentication contracts pass.
+Only Git metadata, that source contract and this evidence change; no compiled
+application input or native pin changes. The delivered `v1.1.0-nuviodv.1` remains
+the exact qualified application, so this CI-only correction needs no new APK.
+Fresh no-op daily sync verification follows the source push.
+
 ### 2026-11-14 maintenance and issue delta
 
 Android was synchronized at the initial check: clean local fast-forward to
