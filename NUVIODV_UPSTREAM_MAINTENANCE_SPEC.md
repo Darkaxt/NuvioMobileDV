@@ -4,7 +4,7 @@ Authorization: `already_authorized` by the user on 2026-09-12.
 
 ## Requirements
 
-### 2026-11-17 Android maintenance (ACTIVE)
+### 2026-11-17 Android maintenance (COMPLETE)
 
 The November 17 cross-repository ledger is in Desktop
 `NUVIODESKTOP_PARITY_SPEC.md`. Existing heartbeat authority covers the complete
@@ -39,7 +39,7 @@ integrated full debug APK. Final signed workflow must also pass the complete
 Linux host suite and generated runtime configuration checks. Independently check
 the normal release/tag/source, downloaded APK hash, signer/package/version/code,
 provider identifiers, updater and pinned native payload. No Android endpoint is
-required or authorized implicitly by this maintenance verification.
+needed for these gates; device playback is not claimed.
 
 Integrated validation now passes: readiness `47acc861fd6a543dcef6d15f611b7686`,
 original workflow `d8619b22d418e8b423a1e1427fc7b047`, native exit 0 / verified
@@ -61,8 +61,20 @@ exports. Nine pinned libraries match byte-for-byte; AGP's stripped local C++
 runtime retains every allocated ELF section. Gate-owned native caches were
 reclaimed by Coordinator after process exit, and its remaining three spent log
 members / 157474 bytes were removed immediately through reviewed transaction
-`60aaa0886477deb7ec9f991da22e96dd`. Signed full-suite CI, normal publication and
-independent public APK verification remain required before stage closure.
+`60aaa0886477deb7ec9f991da22e96dd`.
+
+Delivery passes: original signed run `44188988989` completes the full Linux host
+suite, signing, generated configuration/native checks and normal publication from
+`60c33e2d775b5f483f95fe58efc974e33e37e809`. Independently retrieved normal
+`v1.1.0-nuviodv.1` resolves to that source. APK SHA-256
+`1707d8ec218dfab700239fa692bae0a59113f5969272bd9ff58d36474c1d4984` matches GitHub
+and the release notes. Package/label/version/code, existing signer
+`1FB94424753A90F993C678B6FA4322579253BB303F22C335DB395A9E2557D571`, v2 signature,
+all ten exact pinned native hashes, both defined libdovi exports, fork updater and
+SIMKL/MDBList/Trakt client hashes pass. Fresh no-op daily sync `44190047181` is
+successful and inspected upstream remains contained. No device access or device
+playback validation is claimed. Remaining cross-repository maintenance is tracked
+in the Desktop ledger rather than treated as Android delivery work.
 
 ### 2026-11-14 maintenance and issue delta
 
