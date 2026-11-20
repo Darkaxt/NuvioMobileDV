@@ -4,6 +4,22 @@ Authorization: `already_authorized` by the user on 2026-09-12.
 
 ## Requirements
 
+### 2026-11-20 Android maintenance (COMPLETE)
+
+Fast-forwarded the clean checkout to daily-delivered 0df56f67e, which contains
+inspected upstream e022cfdf7. Sync 44741250885 and release 44534094643 succeed.
+Normal v1.1.0-nuviodv.3 / code 12272 is independently downloaded: APK SHA-256
+4a7f7051507bcb2125dea77ac98cc1229a6a4ae3cc8c630efe15a9fba958b159. Existing signer
+1FB94424753A90F993C678B6FA4322579253BB303F22C335DB395A9E2557D571 and v2 signature
+pass, package com.darkaxt.nuviodv and ARM64 identity match. All ten native libraries
+are byte-identical to the unchanged qualified AAR e8f5e4063a2db82a78c84350d8170ec7951a301488248b82b1bae9a4779bf02a.
+Non-empty SIMKL/MDBList/Trakt client identifiers match the authenticated local
+configuration by hash and are present in delivered DEX; updater targets this fork.
+No source correction, rebuild, duplicate release or device access is needed.
+Wrapper 27bde9f7c contains FortunasXP fee434bfc with zero missing commits; successful
+42532012258 / artifact 13637774468 is unexpired. Full cross-repository reconciliation
+is tracked in Desktop NUVIODESKTOP_PARITY_SPEC.md.
+
 ### 2026-11-17 Android maintenance (COMPLETE)
 
 The November 17 cross-repository ledger is in Desktop
