@@ -4,7 +4,7 @@ Authorization: `already_authorized` by the user on 2026-09-12.
 
 ## Requirements
 
-### 2026-11-25 Android maintenance (ACTIVE)
+### 2026-11-25 Android maintenance (COMPLETE)
 
 Owner: Claude NuvioDV maintenance task. Daily sync 45419876570 failed closed on
 three conflicts with upstream 0d20af832 / 1.1.0-beta.3 (47 commits): both
@@ -22,7 +22,12 @@ gated readiness b875be01e962600230c21266bc939acf passes the focused
 player/playback host tests (61 suites, 0 failures) and the full debug APK
 (package com.darkaxt.nuviodv, 1.1.0-nuviodv.6 / 12275, label NuvioDV, ARM64-only
 player). Nine AAR libraries are byte-identical in the APK; libc++_shared differs
-only by the known AGP stripping. Signed release and public APK checks follow.
+only by the known AGP stripping. Delivery passes: signed run 45596471577 publishes
+normal v1.1.0-nuviodv.6 from 7bed9843bc71ff6f43e93377770a8d42f94bfeb7. Downloaded APK
+SHA-256 6e6299ea8f89a57d2afd4fc7893f21e7ef03054f693f9ecf133458a482ab0a8c matches GitHub;
+existing signer 1FB94424...57D571 with v2 signature, package/label/version/code,
+ARM64-only payload and AAR-identical libmpv/libplayer/libavcodec pass. No device
+access or device playback validation is claimed.
 
 ### 2026-11-20 Android maintenance (COMPLETE)
 
