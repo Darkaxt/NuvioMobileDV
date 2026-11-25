@@ -4,6 +4,26 @@ Authorization: `already_authorized` by the user on 2026-09-12.
 
 ## Requirements
 
+### 2026-11-25 Android maintenance (ACTIVE)
+
+Owner: Claude NuvioDV maintenance task. Daily sync 45419876570 failed closed on
+three conflicts with upstream 0d20af832 / 1.1.0-beta.3 (47 commits): both
+Vietnamese string files and Version.xcconfig. The fork's vi changes were
+line-ending-only (content identical ignoring CR), so upstream content is taken
+with the fork's LF normalization; the version helper advances to 1.1.0-nuviodv.6 /
+12275. Upstream workflows are unchanged. Retained upstream ASS/SSA styling,
+libmpv 60sp subtitle maximum, ExoPlayer libass, addon subtitle runtime state and
+updated Media3 common/extractor AARs; their new mpv property calls compile against
+the pinned 0.1.12 wrapper. Identity, AAR hash, D4 failover, Animation toggle and
+Anime4K MAIN_raw shaders are retained.
+
+Local verification: sync/version/RPDB/release contracts and fork invariants pass;
+gated readiness b875be01e962600230c21266bc939acf passes the focused
+player/playback host tests (61 suites, 0 failures) and the full debug APK
+(package com.darkaxt.nuviodv, 1.1.0-nuviodv.6 / 12275, label NuvioDV, ARM64-only
+player). Nine AAR libraries are byte-identical in the APK; libc++_shared differs
+only by the known AGP stripping. Signed release and public APK checks follow.
+
 ### 2026-11-20 Android maintenance (COMPLETE)
 
 Fast-forwarded the clean checkout to daily-delivered 0df56f67e, which contains
