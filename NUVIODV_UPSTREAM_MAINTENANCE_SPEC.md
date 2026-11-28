@@ -4,7 +4,7 @@ Authorization: `already_authorized` by the user on 2026-09-12.
 
 ## Requirements
 
-### 2026-11-28 Android maintenance (COMPLETE pending release verification below)
+### 2026-11-28 Android maintenance (COMPLETE)
 
 Owner: Claude NuvioDV maintenance task. Manual merge of upstream de46440d0 (19
 commits: audio subtitle sync with sherpa-onnx 1.13.8 AAR fetched with SHA check,
@@ -24,6 +24,11 @@ the store is unchanged since 2026-09-05 and upstream CI never runs host tests;
 suspected Windows rename semantics in Robolectric AtomicFile, unconfirmed. Attempt
 2 (focused spec set, workflow ec3b60903ea964b28c5b11ba49a191c8) passed: player and
 playback host tests plus `:androidApp:assembleFullDebug`.
+Delivery: merge commit 1c09b40998 pushed to cmp-rewrite; release run 46136051222
+published normal (non-draft, non-prerelease) `v1.1.0-nuviodv.7` with the single asset
+`NuvioDV-1.1.0-nuviodv.7-arm64-v8a.apk` (sha256 a04d6173dc250430783fd5379120442c92b0983855d89a80634ae85635afd242,
+60250885 bytes). apksigner v2 signer 1fb94424753a90f993c678b6fa4322579253bb303f22c335db395a9e2557d571;
+aapt2: package com.darkaxt.nuviodv, versionCode 12276, versionName 1.1.0-nuviodv.7, native-code arm64-v8a.
 
 ### 2026-11-28 Gradle 9.9.2 wrapper (COMPLETE)
 
