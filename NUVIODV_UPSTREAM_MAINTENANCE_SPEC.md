@@ -4,6 +4,27 @@ Authorization: `already_authorized` by the user on 2026-09-12.
 
 ## Requirements
 
+### 2026-11-28 Android maintenance (COMPLETE pending release verification below)
+
+Owner: Claude NuvioDV maintenance task. Manual merge of upstream de46440d0 (19
+commits: audio subtitle sync with sherpa-onnx 1.13.8 AAR fetched with SHA check,
+lib-nuvio-engine-android 0.1.7, silero VAD model). The single conflict in
+`PlayerEngine.android.kt` keeps the fork's `anime4kEnabled` parameter and Anime4K
+block and adopts upstream's `MpvAudioSyncHost` interface on the class header. The
+version helper advances to 1.1.0-nuviodv.7 / 12276 (upstream 1.1.0-beta.3 / 161).
+Identity com.darkaxt.nuviodv, the patched libmpv AAR pin (sha256 checked), D4
+failover, per-title Animation toggle and shipped Anime4K S/M shaders are unchanged.
+Contracts (pipeline gate) all pass: advance_nuviodv_version, upstream sync
+workflow, RPDB icon and portrait coverage, configure-release. Gate ticket
+`dad85462d316398018032a478b1bf7a0`: attempt 1 (unfiltered host suite, workflow
+939e14366d36299e961e8f678fe18543) failed 1 of 575 tests,
+`AndroidDownloadLifecycleTest.transferStateAndCredentialsSurviveProcessRecreation[34]`
+(expected 12, was 0). Open finding, not fixed: no download code is in the merge,
+the store is unchanged since 2026-09-05 and upstream CI never runs host tests;
+suspected Windows rename semantics in Robolectric AtomicFile, unconfirmed. Attempt
+2 (focused spec set, workflow ec3b60903ea964b28c5b11ba49a191c8) passed: player and
+playback host tests plus `:androidApp:assembleFullDebug`.
+
 ### 2026-11-28 Gradle 9.9.2 wrapper (COMPLETE)
 
 Toolchain request `weekly-20261128-nuvio-gradle` from the LLM Coordinator
