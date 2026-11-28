@@ -4,6 +4,20 @@ Authorization: `already_authorized` by the user on 2026-09-12.
 
 ## Requirements
 
+### 2026-11-28 Gradle 9.9.2 wrapper (COMPLETE)
+
+Toolchain request `weekly-20261128-nuvio-gradle` from the LLM Coordinator
+(contract `D:\Maintenance\Toolchains\README.md`). The wrapper moved from
+`gradle-9.4.1-bin` to `gradle-9.9.2-bin`. AGP 9.2.0, Kotlin 2.4.10 and the
+CI JDKs (17/21) are unchanged: Gradle 9.9.2 is tested with AGP 9.0 through
+9.5.0-alpha10 and Kotlin 2.0.0 through 2.5.0-Beta1, and it runs on JVM 17-27.
+Gate ticket `a359d7515b0aefa28fa75201ffa02eea`: `--version` reported Gradle
+9.9.2 on Zulu 21.0.13; the focused player/playback host tests (478 tests, 0
+failures) and `:androidApp:assembleFullDebug` passed. Risk: upstream still
+pins 9.4.1, so if upstream edits `gradle-wrapper.properties` the daily sync
+conflicts there and fails closed (it auto-resolves only Version.xcconfig).
+Resolve that by keeping the newer of the two versions.
+
 ### 2026-11-25 Android maintenance (COMPLETE)
 
 Owner: Claude NuvioDV maintenance task. Daily sync 45419876570 failed closed on
